@@ -1,7 +1,9 @@
 import Foundation
 
-class APIService {
+@MainActor
+final class APIService {
     static let shared = APIService()
+    private init() {}
 
     func sendMessage(model: AIModel, message: String, chatId: String?) async throws -> ChatResponse {
         guard let url = URL(string: "\(API_BASE)/api/\(model.apiProvider)") else {
