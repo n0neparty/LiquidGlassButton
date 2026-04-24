@@ -13,7 +13,7 @@
 		A1000004 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014 /* ChatView.swift */; };
 		A1000005 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000015 /* APIService.swift */; };
 		A1000006 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000016 /* Models.swift */; };
-		A1000007 /* GlassButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000017 /* GlassButton.swift */; };
+		A1000007 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000017 /* ChatView.swift */; };
 		A1000008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000018 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -25,7 +25,7 @@
 		A1000014 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		A1000015 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		A1000016 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		A1000017 /* GlassButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassButton.swift; sourceTree = "<group>"; };
+		A1000017 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		A1000018 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
