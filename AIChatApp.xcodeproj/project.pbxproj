@@ -7,35 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1000001 /* AIChatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000011 /* AIChatApp.swift */; };
-		A1000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000012 /* ContentView.swift */; };
-		A1000003 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000013 /* HomeView.swift */; };
-		A1000004 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014 /* HomeView.swift */; };
-		A1000005 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000015 /* APIService.swift */; };
-		A1000006 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000016 /* Models.swift */; };
-		A1000007 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000017 /* ChatView.swift */; };
-		A1000008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000018 /* Assets.xcassets */; };
+		A1000001 /* AIChatApp.swift in Sources */    = {isa = PBXBuildFile; fileRef = A1000011; };
+		A1000002 /* ContentView.swift in Sources */  = {isa = PBXBuildFile; fileRef = A1000012; };
+		A1000003 /* HomeView.swift in Sources */     = {isa = PBXBuildFile; fileRef = A1000013; };
+		A1000004 /* APIService.swift in Sources */   = {isa = PBXBuildFile; fileRef = A1000014; };
+		A1000005 /* Models.swift in Sources */       = {isa = PBXBuildFile; fileRef = A1000015; };
+		A1000006 /* Assets.xcassets in Resources */  = {isa = PBXBuildFile; fileRef = A1000016; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1000010 /* AIChatApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIChatApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1000011 /* AIChatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatApp.swift; sourceTree = "<group>"; };
+		A1000010 /* AIChatApp.app */     = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIChatApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000011 /* AIChatApp.swift */   = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatApp.swift;  sourceTree = "<group>"; };
 		A1000012 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A1000013 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		A1000014 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		A1000015 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
-		A1000016 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		A1000017 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
-		A1000018 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1000013 /* HomeView.swift */    = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift;    sourceTree = "<group>"; };
+		A1000014 /* APIService.swift */  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift;  sourceTree = "<group>"; };
+		A1000015 /* Models.swift */      = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift;      sourceTree = "<group>"; };
+		A1000016 /* Assets.xcassets */   = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		A1000020 = {
 			isa = PBXGroup;
-			children = (
-				A1000021 /* AIChatApp */,
-				A1000022 /* Products */,
-			);
+			children = (A1000021, A1000022);
 			sourceTree = "<group>";
 		};
 		A1000021 /* AIChatApp */ = {
@@ -44,20 +37,16 @@
 				A1000011 /* AIChatApp.swift */,
 				A1000012 /* ContentView.swift */,
 				A1000013 /* HomeView.swift */,
-				A1000014 /* ChatView.swift */,
-				A1000015 /* APIService.swift */,
-				A1000016 /* Models.swift */,
-				A1000017 /* GlassButton.swift */,
-				A1000018 /* Assets.xcassets */,
+				A1000014 /* APIService.swift */,
+				A1000015 /* Models.swift */,
+				A1000016 /* Assets.xcassets */,
 			);
 			path = AIChatApp;
 			sourceTree = "<group>";
 		};
 		A1000022 /* Products */ = {
 			isa = PBXGroup;
-			children = (
-				A1000010 /* AIChatApp.app */,
-			);
+			children = (A1000010);
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -67,31 +56,24 @@
 		A1000030 /* AIChatApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1000050;
-			buildPhases = (
-				A1000031 /* Sources */,
-				A1000032 /* Resources */,
-			);
+			buildPhases = (A1000031, A1000032);
 			buildRules = ();
 			dependencies = ();
 			name = AIChatApp;
 			productName = AIChatApp;
-			productReference = A1000010 /* AIChatApp.app */;
+			productReference = A1000010;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		A1000040 /* Project object */ = {
+		A1000040 = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-					A1000030 = {
-						CreatedOnToolsVersion = 15.0;
-					};
-				};
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = { A1000030 = { CreatedOnToolsVersion = 16.0; }; };
 			};
 			buildConfigurationList = A1000041;
 			compatibilityVersion = "Xcode 14.0";
@@ -99,10 +81,10 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (en, Base);
 			mainGroup = A1000020;
-			productRefGroup = A1000022 /* Products */;
+			productRefGroup = A1000022;
 			projectDirPath = "";
 			projectRoot = "";
-			targets = (A1000030 /* AIChatApp */);
+			targets = (A1000030);
 		};
 /* End PBXProject section */
 
@@ -114,10 +96,8 @@
 				A1000001 /* AIChatApp.swift in Sources */,
 				A1000002 /* ContentView.swift in Sources */,
 				A1000003 /* HomeView.swift in Sources */,
-				A1000004 /* ChatView.swift in Sources */,
-				A1000005 /* APIService.swift in Sources */,
-				A1000006 /* Models.swift in Sources */,
-				A1000007 /* GlassButton.swift in Sources */,
+				A1000004 /* APIService.swift in Sources */,
+				A1000005 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,9 +107,7 @@
 		A1000032 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (
-				A1000008 /* Assets.xcassets in Resources */,
-			);
+			files = (A1000006);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
@@ -144,22 +122,18 @@
 		A1000042 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		A1000043 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -181,13 +155,13 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aichat.free;
 				PRODUCT_NAME = AIChatApp;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -204,13 +178,13 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aichat.free;
 				PRODUCT_NAME = AIChatApp;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -218,5 +192,5 @@
 /* End XCBuildConfiguration section */
 
 	};
-	rootObject = A1000040 /* Project object */;
+	rootObject = A1000040;
 }
