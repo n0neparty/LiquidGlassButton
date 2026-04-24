@@ -106,7 +106,7 @@ let ALL_PROVIDERS: [AIProvider] = [
         id: "qwen",
         name: "Qwen",
         icon: "cpu.fill",
-        color: Color(hex: "#059669"),
+        color: Color(hex: "#8B5CF6"),
         models: [
             AIModel(id: "qwen-235b",    name: "Qwen 3 235B",      badge: "Pro",  apiProvider: "g4f",     apiModel: "qwen-3-235b"),
             AIModel(id: "qwen-30b",     name: "Qwen 3 30B",       badge: nil,    apiProvider: "g4f",     apiModel: "qwen-3-30b-a3b"),

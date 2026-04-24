@@ -1,5 +1,48 @@
 import SwiftUI
 
+// MARK: - Liquid Glass modifier
+struct LiquidGlass: ViewModifier {
+    var color: Color = .white
+    var radius: CGFloat = 16
+    var intensity: CGFloat = 0.12
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .fill(color.opacity(intensity))
+                    // Top shimmer
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .fill(LinearGradient(
+                            colors: [.white.opacity(0.18), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                    // Border
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [.white.opacity(0.35), color.opacity(0.2), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.8
+                        )
+                }
+            }
+    }
+}
+
+extension View {
+    func liquidGlass(color: Color = .white, radius: CGFloat = 16, intensity: CGFloat = 0.12) -> some View {
+        modifier(LiquidGlass(color: color, radius: radius, intensity: intensity))
+    }
+}
+
+// MARK: - HomeView
 struct HomeView: View {
     @State private var selectedProvider = ALL_PROVIDERS[0]
     @State private var selectedModel: AIModel = ALL_PROVIDERS[0].models[0]
@@ -17,44 +60,27 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background
                 Color.black.ignoresSafeArea()
 
-                // Ambient glow
+                // Ambient glow behind everything
                 RadialGradient(
-                    colors: [selectedProvider.color.opacity(0.18), .clear],
-                    center: .init(x: 0.5, y: 0.3),
+                    colors: [selectedProvider.color.opacity(0.22), .clear],
+                    center: .init(x: 0.5, y: 0.25),
                     startRadius: 0,
-                    endRadius: 350
+                    endRadius: 420
                 )
                 .ignoresSafeArea()
-                .animation(.easeInOut(duration: 0.5), value: selectedProvider.id)
+                .animation(.easeInOut(duration: 0.6), value: selectedProvider.id)
 
                 VStack(spacing: 0) {
-                    // ── Top bar ──────────────────────────────────────────────
                     topBar
-
-                    // ── Provider picker ──────────────────────────────────────
-                    providerPicker
-                        .padding(.top, 8)
-
-                    // ── Model picker ─────────────────────────────────────────
-                    modelPicker
-                        .padding(.top, 6)
-
+                    providerPicker.padding(.top, 10)
+                    modelPicker.padding(.top, 8)
                     Spacer()
-
-                    // ── Center title ─────────────────────────────────────────
                     centerTitle
-
                     Spacer()
-
-                    // ── Suggestions ──────────────────────────────────────────
                     suggestionChips
-
-                    // ── Input bar ────────────────────────────────────────────
-                    inputBar
-                        .padding(.bottom, 8)
+                    inputBar.padding(.bottom, 8)
                 }
             }
             .navigationDestination(isPresented: $navigateToChat) {
@@ -64,62 +90,71 @@ struct HomeView: View {
         .preferredColorScheme(.dark)
     }
 
-    // MARK: - Top Bar
+    // MARK: Top Bar
     var topBar: some View {
-        HStack {
+        HStack(spacing: 10) {
+            // Settings
             Button { } label: {
                 Image(systemName: "gearshape")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.white.opacity(0.8))
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .frame(width: 38, height: 38)
+                    .liquidGlass(radius: 12)
             }
+
+            // History
             Button { } label: {
                 Image(systemName: "bubble.left")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.white.opacity(0.8))
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .frame(width: 38, height: 38)
+                    .liquidGlass(radius: 12)
             }
-            .padding(.leading, 4)
 
             Spacer()
 
-            // Current model name
+            // Current model pill
             HStack(spacing: 6) {
                 Image(systemName: selectedProvider.icon)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(selectedProvider.color)
                 Text(selectedModel.name)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
                 if let badge = selectedModel.badge {
                     Text(badge)
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(selectedProvider.color)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(selectedProvider.color.opacity(0.15), in: Capsule())
+                        .padding(.horizontal, 5).padding(.vertical, 2)
+                        .background(selectedProvider.color.opacity(0.2), in: Capsule())
                 }
             }
+            .padding(.horizontal, 14).padding(.vertical, 8)
+            .liquidGlass(color: selectedProvider.color, radius: 20, intensity: 0.1)
+            .animation(.spring(response: 0.3), value: selectedModel.id)
 
             Spacer()
 
-            Button { } label: {
+            // New chat
+            Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.white.opacity(0.8))
-                    .padding(8)
-                    .background(.white.opacity(0.08), in: Circle())
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .frame(width: 38, height: 38)
+                    .liquidGlass(color: selectedProvider.color, radius: 12, intensity: 0.15)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 18)
         .padding(.top, 8)
     }
 
-    // MARK: - Provider Picker
+    // MARK: Provider Picker
     var providerPicker: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(ALL_PROVIDERS) { provider in
                     Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
                             selectedProvider = provider
                             selectedModel = provider.models[0]
                         }
@@ -127,86 +162,88 @@ struct HomeView: View {
                         HStack(spacing: 5) {
                             Image(systemName: provider.icon)
                                 .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(selectedProvider.id == provider.id ? provider.color : .white.opacity(0.55))
                             Text(provider.name)
                                 .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(selectedProvider.id == provider.id ? .white : .white.opacity(0.55))
                         }
-                        .foregroundStyle(selectedProvider.id == provider.id ? .black : .white.opacity(0.7))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 7)
-                        .background {
+                        .padding(.horizontal, 13).padding(.vertical, 8)
+                        .liquidGlass(
+                            color: selectedProvider.id == provider.id ? provider.color : .white,
+                            radius: 14,
+                            intensity: selectedProvider.id == provider.id ? 0.2 : 0.06
+                        )
+                        .overlay {
                             if selectedProvider.id == provider.id {
-                                Capsule().fill(provider.color)
-                            } else {
-                                Capsule().fill(.white.opacity(0.08))
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .strokeBorder(provider.color.opacity(0.5), lineWidth: 1)
                             }
                         }
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 18)
         }
     }
 
-    // MARK: - Model Picker
+    // MARK: Model Picker
     var modelPicker: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(selectedProvider.models) { model in
                     Button {
-                        withAnimation(.spring(response: 0.25)) {
-                            selectedModel = model
-                        }
+                        withAnimation(.spring(response: 0.25)) { selectedModel = model }
                     } label: {
-                        HStack(spacing: 4) {
+                        HStack(spacing: 5) {
                             Text(model.name)
                                 .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(selectedModel.id == model.id ? .white : .white.opacity(0.45))
                             if let badge = model.badge {
                                 Text(badge)
                                     .font(.system(size: 10, weight: .bold))
                                     .foregroundStyle(selectedProvider.color)
                             }
                         }
-                        .foregroundStyle(selectedModel.id == model.id ? .white : .white.opacity(0.5))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background {
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(selectedModel.id == model.id
-                                      ? selectedProvider.color.opacity(0.2)
-                                      : .white.opacity(0.05))
-                                .overlay {
-                                    if selectedModel.id == model.id {
-                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                            .strokeBorder(selectedProvider.color.opacity(0.5), lineWidth: 1)
-                                    }
-                                }
+                        .padding(.horizontal, 12).padding(.vertical, 7)
+                        .liquidGlass(
+                            color: selectedModel.id == model.id ? selectedProvider.color : .white,
+                            radius: 11,
+                            intensity: selectedModel.id == model.id ? 0.18 : 0.05
+                        )
+                        .overlay {
+                            if selectedModel.id == model.id {
+                                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                                    .strokeBorder(selectedProvider.color.opacity(0.45), lineWidth: 0.8)
+                            }
                         }
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 18)
         }
     }
 
-    // MARK: - Center Title
+    // MARK: Center Title
     var centerTitle: some View {
         VStack(spacing: 14) {
             Text("Meet \(selectedProvider.name)")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .font(.system(size: 34, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
-                .animation(.none, value: selectedProvider.id)
 
-            Text("Free AI models at your fingertips.\nNo account required.")
+            Text("Free AI at your fingertips.\nNo account required.")
                 .font(.system(size: 16))
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
-                .lineSpacing(4)
+                .lineSpacing(5)
         }
         .padding(.horizontal, 32)
+        .animation(.none, value: selectedProvider.id)
     }
 
-    // MARK: - Suggestion Chips
+    // MARK: Suggestion Chips
     var suggestionChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -215,41 +252,41 @@ struct HomeView: View {
                         inputText = "\(s.0) \(s.1)"
                         navigateToChat = true
                     } label: {
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 3) {
                             Text(s.0)
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundStyle(.white)
                             Text(s.1)
                                 .font(.system(size: 13))
-                                .foregroundStyle(.white.opacity(0.5))
+                                .foregroundStyle(.white.opacity(0.45))
                         }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
-                        .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .padding(.horizontal, 14).padding(.vertical, 12)
+                        .liquidGlass(radius: 16, intensity: 0.07)
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 18)
         }
         .padding(.bottom, 12)
     }
 
-    // MARK: - Input Bar
+    // MARK: Input Bar
     var inputBar: some View {
         HStack(spacing: 10) {
             Button { } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white.opacity(0.7))
-                    .frame(width: 36, height: 36)
-                    .background(.white.opacity(0.08), in: Circle())
+                    .frame(width: 38, height: 38)
+                    .liquidGlass(radius: 19)
             }
             Button { } label: {
                 Image(systemName: "lightbulb")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white.opacity(0.7))
-                    .frame(width: 36, height: 36)
-                    .background(.white.opacity(0.08), in: Circle())
+                    .frame(width: 38, height: 38)
+                    .liquidGlass(radius: 19)
             }
 
             TextField("Ask anything", text: $inputText)
@@ -259,22 +296,31 @@ struct HomeView: View {
                 .focused($inputFocused)
                 .submitLabel(.send)
                 .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(.white.opacity(0.07), in: Capsule())
+                .padding(.horizontal, 16).padding(.vertical, 11)
+                .liquidGlass(radius: 22, intensity: 0.08)
 
             Button {
-                if !inputText.isEmpty { navigateToChat = true }
+                guard !inputText.isEmpty else { return }
+                navigateToChat = true
             } label: {
                 Image(systemName: "arrow.up")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(inputText.isEmpty ? .white.opacity(0.3) : .black)
-                    .frame(width: 36, height: 36)
-                    .background(inputText.isEmpty ? AnyShapeStyle(.white.opacity(0.08)) : AnyShapeStyle(Color.white), in: Circle())
+                    .frame(width: 38, height: 38)
+                    .background {
+                        if inputText.isEmpty {
+                            Circle().fill(.white.opacity(0.08))
+                        } else {
+                            Circle().fill(Color.white)
+                            Circle().fill(LinearGradient(
+                                colors: [.white, selectedProvider.color.opacity(0.3)],
+                                startPoint: .top, endPoint: .bottom
+                            ))
+                        }
+                    }
             }
             .disabled(inputText.isEmpty)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16).padding(.vertical, 10)
     }
 }
