@@ -1,0 +1,28 @@
+workflows:
+  ios-adhoc:
+    name: iOS Ad Hoc Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Build IPA
+        script: |
+          xcodebuild \
+            -project AIChatApp.xcodeproj \
+            -scheme AIChatApp \
+            -configuration Release \
+            -archivePath build/AIChatApp.xcarchive \
+            archive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+          
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/AIChatApp.xcarchive \
+            -exportPath build/ipa \
+            -exportOptionsPlist ExportOptions.plist
+    artifacts:
+      - build/ipa/*.ipa
