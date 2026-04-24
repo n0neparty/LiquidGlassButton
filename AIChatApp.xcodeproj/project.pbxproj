@@ -10,7 +10,7 @@
 		A1000001 /* AIChatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000011 /* AIChatApp.swift */; };
 		A1000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000012 /* ContentView.swift */; };
 		A1000003 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000013 /* HomeView.swift */; };
-		A1000004 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014 /* ChatView.swift */; };
+		A1000004 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014 /* HomeView.swift */; };
 		A1000005 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000015 /* APIService.swift */; };
 		A1000006 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000016 /* Models.swift */; };
 		A1000007 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000017 /* ChatView.swift */; };
@@ -22,7 +22,7 @@
 		A1000011 /* AIChatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatApp.swift; sourceTree = "<group>"; };
 		A1000012 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1000013 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		A1000014 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		A1000014 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		A1000015 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		A1000016 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		A1000017 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
