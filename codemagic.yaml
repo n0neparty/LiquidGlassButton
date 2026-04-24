@@ -1,28 +1,33 @@
 workflows:
-  ios-adhoc:
-    name: iOS Ad Hoc Build
+  ios-unsigned:
+    name: iOS Unsigned IPA
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
       xcode: latest
-      cocoapods: default
     scripts:
-      - name: Build IPA
+      - name: Build unsigned app
         script: |
           xcodebuild \
             -project AIChatApp.xcodeproj \
             -scheme AIChatApp \
             -configuration Release \
-            -archivePath build/AIChatApp.xcarchive \
-            archive \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath build/DerivedData \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-          
-          xcodebuild \
-            -exportArchive \
-            -archivePath build/AIChatApp.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist ExportOptions.plist
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            build
+
+      - name: Package as IPA
+        script: |
+          APP_PATH=$(find build/DerivedData -name "*.app" | head -1)
+          mkdir -p build/Payload
+          cp -r "$APP_PATH" build/Payload/
+          cd build
+          zip -r AIChatApp.ipa Payload/
+          echo "IPA created: $(ls -lh AIChatApp.ipa)"
+
     artifacts:
-      - build/ipa/*.ipa
+      - build/AIChatApp.ipa
