@@ -120,35 +120,36 @@ struct ChatView: View {
             }
             .frame(height: 44)
             
-            // Send button - полностью белая когда активна
-            Button {
-                if !inputText.isEmpty {
-                    sendMessage()
-                }
-            } label: {
-                if isLoading {
+            // Send button - одинаковый размер в обоих состояниях
+            if isLoading {
+                Button { } label: {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .black))
                         .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                        .background(Circle().fill(.white))
-                } else {
+                }
+                .buttonStyle(.plain)
+                .background(Circle().fill(.white).frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize))
+                .disabled(true)
+            } else if inputText.isEmpty {
+                Button { } label: {
                     Image(systemName: "arrow.up")
                         .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(inputText.isEmpty ? .white : .black)
+                        .foregroundStyle(.white)
                         .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                        .background {
-                            if inputText.isEmpty {
-                                Color.clear
-                            } else {
-                                Circle().fill(.white)
-                            }
-                        }
                 }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .disabled(true)
+            } else {
+                Button { sendMessage() } label: {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .foregroundStyle(.black)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                }
+                .buttonStyle(.plain)
+                .background(Circle().fill(.white).frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize))
             }
-            .buttonStyle(inputText.isEmpty ? .glass : .borderless)
-            .buttonBorderShape(.circle)
-            .disabled(inputText.isEmpty || isLoading)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: inputText.isEmpty)
         }
         .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
         .padding(.vertical, debugSettings.inputBarVerticalPadding)
