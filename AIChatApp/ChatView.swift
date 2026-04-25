@@ -301,12 +301,6 @@ struct MessageBubble: View {
                         .background(
                             RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
                                 .fill(message.role == .ai ? Color(white: 0.12) : Color.clear)
-                                .overlay(
-                                    message.role == .ai
-                                        ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                                            .fill(providerColor.opacity(0.08))
-                                        : nil
-                                )
                         )
                         .background(
                             message.role != .ai
