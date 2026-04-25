@@ -7,7 +7,6 @@ struct HomeView: View {
     @State private var inputText = ""
     @State private var navigateToChat = false
     @State private var showSettings = false
-    @State private var showDebugSettings = false
     @State private var isLoadingModel = true
     @FocusState private var inputFocused: Bool
     @ObservedObject var debugSettings = DebugSettings.shared
@@ -61,9 +60,6 @@ struct HomeView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView(selectedProvider: $selectedProvider, selectedModel: $selectedModel)
             }
-            .sheet(isPresented: $showDebugSettings) {
-                DebugSettingsView()
-            }
         }
         .preferredColorScheme(.dark)
         .task {
@@ -85,12 +81,6 @@ struct HomeView: View {
                 }
                 Button { } label: {
                     Label("History", systemImage: "bubble.left.fill")
-                }
-                Divider()
-                Button {
-                    showDebugSettings = true
-                } label: {
-                    Label("Debug Settings", systemImage: "hammer.fill")
                 }
             } label: {
                 Image(systemName: "line.3.horizontal")
