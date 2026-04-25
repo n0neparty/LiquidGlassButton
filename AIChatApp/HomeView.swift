@@ -263,22 +263,32 @@ struct HomeView: View {
                 .layoutPriority(-1)
 
             // Send button
-            Button { 
-                if !inputText.isEmpty {
-                    navigateToChat = true
+            if inputText.isEmpty {
+                Button { } label: {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                 }
-            } label: {
-                Image(systemName: "arrow.up")
-                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                    .foregroundStyle(inputText.isEmpty ? .white : .black)
-                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .disabled(true)
+                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                .layoutPriority(1)
+            } else {
+                Button {
+                    navigateToChat = true
+                } label: {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .foregroundStyle(.black)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                }
+                .buttonStyle(.plain)
+                .background(Circle().fill(.white))
+                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                .layoutPriority(1)
             }
-            .buttonStyle(inputText.isEmpty ? .glass : .plain)
-            .buttonBorderShape(.circle)
-            .background(inputText.isEmpty ? nil : Circle().fill(.white))
-            .disabled(inputText.isEmpty)
-            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-            .layoutPriority(1)
         }
         .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
         .padding(.vertical, debugSettings.inputBarVerticalPadding)
