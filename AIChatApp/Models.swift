@@ -28,7 +28,7 @@ let ALL_PROVIDERS: [AIProvider] = [
     AIProvider(id: "grok", name: "Grok", icon: "bolt.fill", colorHex: "#1D9BF0", models: [
         AIModel(id: "grok-fast",    name: "Grok 4.1 Fast",  badge: "Fast",  apiProvider: "merlin",  apiModel: "grok-4.1-fast"),
         AIModel(id: "grok-4",       name: "Grok 4",         badge: nil,     apiProvider: "g4f",     apiModel: "grok"),
-        AIModel(id: "grok4-pplx",   name: "Grok 4 (Perplexity)", badge: "Pro", apiProvider: "g4f", apiModel: "grok4"),
+        AIModel(id: "grok4-pplx",   name: "Grok 4",              badge: "Pro", apiProvider: "g4f", apiModel: "grok4"),
     ]),
     AIProvider(id: "chatgpt", name: "ChatGPT", icon: "sparkles", colorHex: "#10A37F", models: [
         AIModel(id: "gpt4o-mini",   name: "GPT-4o mini",    badge: "Fast",  apiProvider: "github",  apiModel: "gpt-4o-mini"),
@@ -38,7 +38,6 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "gpt45",        name: "GPT-4.5",        badge: nil,     apiProvider: "g4f",     apiModel: "gpt45"),
         AIModel(id: "gpt5",         name: "GPT-5",          badge: "Pro",   apiProvider: "g4f",     apiModel: "gpt5"),
         AIModel(id: "gpt5-think",   name: "GPT-5 Thinking", badge: "Think", apiProvider: "g4f",     apiModel: "gpt5_thinking"),
-        AIModel(id: "gpt54-nano",   name: "GPT-5.4 Nano",   badge: "Tiny",  apiProvider: "g4f",     apiModel: "openai"),
         AIModel(id: "gpt5-mini",    name: "GPT-5 Mini",     badge: nil,     apiProvider: "merlin",  apiModel: "gpt-5-mini"),
         AIModel(id: "gpt54",        name: "GPT-5.4",        badge: "Pro",   apiProvider: "merlin",  apiModel: "gpt-5.4"),
         AIModel(id: "gpt52",        name: "GPT-5.2",        badge: nil,     apiProvider: "merlin",  apiModel: "gpt-5.2"),
@@ -50,7 +49,6 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "o3-labs",      name: "O3 Labs",        badge: nil,     apiProvider: "g4f",     apiModel: "o3_labs"),
         AIModel(id: "o3pro-labs",   name: "O3 Pro Labs",    badge: nil,     apiProvider: "g4f",     apiModel: "o3pro_labs"),
         AIModel(id: "o4mini",       name: "O4 Mini",        badge: "Fast",  apiProvider: "g4f",     apiModel: "o4mini"),
-        AIModel(id: "openai-lg",    name: "OpenAI Large",   badge: nil,     apiProvider: "g4f",     apiModel: "openai-large"),
     ]),
     AIProvider(id: "gemini", name: "Gemini", icon: "star.fill", colorHex: "#4285F4", models: [
         AIModel(id: "gem-fast",         name: "Gemini Fast",              badge: "Fast", apiProvider: "g4f",    apiModel: "gemini-fast"),

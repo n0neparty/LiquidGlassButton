@@ -192,9 +192,7 @@ struct HomeView: View {
                 .lineSpacing(4)
         }
         .padding(.horizontal, 32)
-    }
-
-    // MARK: Suggestion Chips (Action Cards) - квадратные без liquid glass
+    } (Action Cards) - квадратные без liquid glass
     var suggestionChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: debugSettings.suggestionChipsSpacing) {
