@@ -64,12 +64,14 @@ struct ChatView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.title3.bold())
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 14, weight: .semibold))
+                        Text("Back")
+                            .font(.system(size: 16, weight: .regular))
+                    }
+                    .foregroundStyle(.white)
                 }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
             }
         }
         .navigationTitle(model.name)
@@ -85,7 +87,7 @@ struct ChatView: View {
     
     // MARK: Input Bar с системным liquid glass
     var inputBar: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             Button { } label: {
                 Image(systemName: "plus")
                     .font(.title3.bold())

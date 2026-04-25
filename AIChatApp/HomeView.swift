@@ -225,7 +225,7 @@ struct HomeView: View {
 
     // MARK: Input Bar (Sticky Bottom)
     var inputBar: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             // Plus button
             Button { } label: {
                 Image(systemName: "plus")

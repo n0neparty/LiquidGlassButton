@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Debug Settings для настройки размеров кнопок
 @MainActor
 class DebugSettings: ObservableObject {
-    @Published var buttonSize: CGFloat = 38
+    @Published var buttonSize: CGFloat = 34
     
     static let shared = DebugSettings()
 }
@@ -35,8 +35,8 @@ struct DebugSettingsView: View {
                     }
                     
                     Section {
-                        Button("Reset to Default (38)") {
-                            settings.buttonSize = 38
+                        Button("Reset to Default (34)") {
+                            settings.buttonSize = 34
                         }
                     }
                 }
