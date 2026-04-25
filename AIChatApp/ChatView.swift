@@ -12,6 +12,7 @@ struct ChatView: View {
     @State private var isLoading = false
     @State private var selectedImage: UIImage?
     @State private var showImagePicker = false
+    @State private var thinkingMode = false
     @FocusState private var inputFocused: Bool
     @ObservedObject var debugSettings = DebugSettings.shared
     @Environment(\.dismiss) var dismiss
@@ -133,13 +134,22 @@ struct ChatView: View {
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
                     
-                    Button { } label: {
-                        Image(systemName: "lightbulb.fill")
+                    Button { 
+                        thinkingMode.toggle()
+                    } label: {
+                        Image(systemName: thinkingMode ? "lightbulb.fill" : "lightbulb")
                             .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                             .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                     }
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
+                    .overlay(
+                        thinkingMode ? 
+                        Circle()
+                            .stroke(provider.color, lineWidth: 2)
+                            .frame(width: debugSettings.buttonSize + 4, height: debugSettings.buttonSize + 4)
+                        : nil
+                    )
                 }
                 
                 Spacer()
@@ -202,6 +212,7 @@ struct ChatView: View {
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let userMsg = inputText
         let imageToSend = selectedImage
+        let useThinking = thinkingMode
         inputText = ""
         selectedImage = nil
         messages.append(ChatMessage(role: .user, text: userMsg))
@@ -209,21 +220,78 @@ struct ChatView: View {
         
         Task {
             do {
-                let response = try await APIService.shared.sendMessage(
-                    model: model,
-                    message: userMsg,
-                    chatId: chatId,
-                    image: imageToSend
-                )
-                
-                if let text = response.text {
-                    messages.append(ChatMessage(role: .ai, text: text))
-                }
-                if let id = response.resolvedChatId {
-                    chatId = id
-                }
-                if let error = response.error {
-                    messages.append(ChatMessage(role: .error, text: error))
+                // If thinking mode is enabled, first send system prompt
+                if useThinking {
+                    let thinkingPrompt = "You are now in deep thinking mode. Before answering the user's question, you must think step by step about the problem. Analyze it carefully, consider different approaches, and reason through the solution. If you understand and are ready to think deeply, respond with exactly: 1337"
+                    
+                    let thinkingResponse = try await APIService.shared.sendMessage(
+                        model: model,
+                        message: thinkingPrompt,
+                        chatId: chatId,
+                        image: nil
+                    )
+                    
+                    // Update chatId from thinking response
+                    if let id = thinkingResponse.resolvedChatId {
+                        chatId = id
+                    }
+                    
+                    // Check if AI confirmed thinking mode
+                    if thinkingResponse.text?.contains("1337") == true {
+                        // Now send the actual user message in the same chat
+                        let response = try await APIService.shared.sendMessage(
+                            model: model,
+                            message: userMsg,
+                            chatId: chatId,
+                            image: imageToSend
+                        )
+                        
+                        if let text = response.text {
+                            messages.append(ChatMessage(role: .ai, text: text))
+                        }
+                        if let id = response.resolvedChatId {
+                            chatId = id
+                        }
+                        if let error = response.error {
+                            messages.append(ChatMessage(role: .error, text: error))
+                        }
+                    } else {
+                        // Thinking mode activation failed, send normally
+                        let response = try await APIService.shared.sendMessage(
+                            model: model,
+                            message: userMsg,
+                            chatId: chatId,
+                            image: imageToSend
+                        )
+                        
+                        if let text = response.text {
+                            messages.append(ChatMessage(role: .ai, text: text))
+                        }
+                        if let id = response.resolvedChatId {
+                            chatId = id
+                        }
+                        if let error = response.error {
+                            messages.append(ChatMessage(role: .error, text: error))
+                        }
+                    }
+                } else {
+                    // Normal mode - send message directly
+                    let response = try await APIService.shared.sendMessage(
+                        model: model,
+                        message: userMsg,
+                        chatId: chatId,
+                        image: imageToSend
+                    )
+                    
+                    if let text = response.text {
+                        messages.append(ChatMessage(role: .ai, text: text))
+                    }
+                    if let id = response.resolvedChatId {
+                        chatId = id
+                    }
+                    if let error = response.error {
+                        messages.append(ChatMessage(role: .error, text: error))
+                    }
                 }
             } catch {
                 messages.append(ChatMessage(role: .error, text: "Error: \(error.localizedDescription)"))
