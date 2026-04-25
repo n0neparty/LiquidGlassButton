@@ -1,7 +1,6 @@
 import SwiftUI
 
 // MARK: - Debug Settings для настройки всех параметров UI
-@MainActor
 class DebugSettings: ObservableObject {
     // Button sizes
     @Published var buttonSize: CGFloat = 34
