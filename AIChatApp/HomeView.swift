@@ -7,8 +7,10 @@ struct HomeView: View {
     @State private var inputText = ""
     @State private var navigateToChat = false
     @State private var showSettings = false
+    @State private var showDebugSettings = false
     @State private var isLoadingModel = true
     @FocusState private var inputFocused: Bool
+    @ObservedObject var debugSettings = DebugSettings.shared
 
     let suggestions = [
         ("Tell me", "something fascinating"),
@@ -59,6 +61,9 @@ struct HomeView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView(selectedProvider: $selectedProvider, selectedModel: $selectedModel)
             }
+            .sheet(isPresented: $showDebugSettings) {
+                DebugSettingsView()
+            }
         }
         .preferredColorScheme(.dark)
         .task {
@@ -81,10 +86,16 @@ struct HomeView: View {
                 Button { } label: {
                     Label("History", systemImage: "bubble.left.fill")
                 }
+                Divider()
+                Button {
+                    showDebugSettings = true
+                } label: {
+                    Label("Debug Settings", systemImage: "hammer.fill")
+                }
             } label: {
                 Image(systemName: "line.3.horizontal")
                     .font(.title3.bold())
-                    .frame(width: 40, height: 40)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
@@ -121,7 +132,7 @@ struct HomeView: View {
             Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
                     .font(.title3.bold())
-                    .frame(width: 40, height: 40)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
@@ -219,7 +230,7 @@ struct HomeView: View {
             Button { } label: {
                 Image(systemName: "plus")
                     .font(.title3.bold())
-                    .frame(width: 40, height: 40)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
@@ -228,7 +239,7 @@ struct HomeView: View {
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.title3.bold())
-                    .frame(width: 40, height: 40)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
@@ -255,7 +266,7 @@ struct HomeView: View {
                 Button { } label: {
                     Image(systemName: "arrow.up")
                         .font(.title3.bold())
-                        .frame(width: 40, height: 40)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
@@ -267,7 +278,7 @@ struct HomeView: View {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.black)
-                        .frame(width: 40, height: 40)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                         .background(Circle().fill(.white))
                 }
             }

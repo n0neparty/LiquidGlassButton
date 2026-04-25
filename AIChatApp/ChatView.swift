@@ -10,6 +10,8 @@ struct ChatView: View {
     @State private var chatId: String?
     @State private var isLoading = false
     @FocusState private var inputFocused: Bool
+    @ObservedObject var debugSettings = DebugSettings.shared
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ZStack {
@@ -60,11 +62,11 @@ struct ChatView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    // Navigation back
+                    dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.title3.bold())
-                        .frame(width: 40, height: 40)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
@@ -87,7 +89,7 @@ struct ChatView: View {
             Button { } label: {
                 Image(systemName: "plus")
                     .font(.title3.bold())
-                    .frame(width: 40, height: 40)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
@@ -95,7 +97,7 @@ struct ChatView: View {
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.title3.bold())
-                    .frame(width: 40, height: 40)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
@@ -121,7 +123,7 @@ struct ChatView: View {
                 Button { } label: {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                        .frame(width: 40, height: 40)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                         .background(Circle().fill(.white))
                 }
                 .disabled(true)
@@ -129,7 +131,7 @@ struct ChatView: View {
                 Button { } label: {
                     Image(systemName: "arrow.up")
                         .font(.title3.bold())
-                        .frame(width: 40, height: 40)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
@@ -139,7 +141,7 @@ struct ChatView: View {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.black)
-                        .frame(width: 40, height: 40)
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                         .background(Circle().fill(.white))
                 }
             }
