@@ -22,8 +22,8 @@ struct AIModel: Identifiable, Hashable, Sendable {
     let apiModel: String
 }
 
-// nonisolated чтобы не требовать @MainActor при доступе
-nonisolated(unsafe) let ALL_PROVIDERS: [AIProvider] = [
+// Global providers list
+let ALL_PROVIDERS: [AIProvider] = [
     AIProvider(id: "grok",     name: "Grok",     icon: "bolt.fill",                   colorHex: "#1D9BF0", models: [
         AIModel(id: "grok-fast",   name: "Grok 4.1 Fast",    badge: "Fast",  apiProvider: "merlin",  apiModel: "grok-4.1-fast"),
         AIModel(id: "grok-mini",   name: "Grok 4.1 Mini",    badge: nil,     apiProvider: "g4f",     apiModel: "grok-4.1-mini:free"),
