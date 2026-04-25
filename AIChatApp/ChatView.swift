@@ -93,9 +93,9 @@ struct ChatView: View {
     
     // MARK: Input Bar с системным liquid glass
     var inputBar: some View {
-        HStack(spacing: debugSettings.inputBarSpacing) {
+        HStack(spacing: 0) {
             // Left buttons group
-            HStack(spacing: debugSettings.inputBarSpacing) {
+            HStack(spacing: 6) {
                 Button { } label: {
                     Image(systemName: "plus")
                         .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
@@ -113,6 +113,9 @@ struct ChatView: View {
                 .buttonBorderShape(.circle)
             }
             
+            Spacer()
+                .frame(width: 10)
+            
             TextField("Ask anything", text: $inputText)
                 .font(.system(size: 16, weight: .regular))
                 .foregroundStyle(.white)
@@ -125,6 +128,9 @@ struct ChatView: View {
                 .frame(height: 44)
                 .background(Capsule().fill(.ultraThinMaterial))
                 .layoutPriority(-1)
+            
+            Spacer()
+                .frame(width: debugSettings.inputBarSpacing)
             
             // Send button
             if inputText.isEmpty {

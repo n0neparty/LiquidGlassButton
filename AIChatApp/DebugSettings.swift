@@ -8,15 +8,15 @@ class DebugSettings: ObservableObject {
     @Published var modelPillHeight: CGFloat = 32
     
     // Spacing
-    @Published var inputBarSpacing: CGFloat = 5
-    @Published var topBarSpacing: CGFloat = 12
+    @Published var inputBarSpacing: CGFloat = 8
+    @Published var topBarSpacing: CGFloat = 8
     @Published var suggestionChipsSpacing: CGFloat = 12
     @Published var messageSpacing: CGFloat = 16
     
     // Padding
     @Published var inputBarHorizontalPadding: CGFloat = 16
     @Published var inputBarVerticalPadding: CGFloat = 12
-    @Published var topBarHorizontalPadding: CGFloat = 11
+    @Published var topBarHorizontalPadding: CGFloat = 16
     @Published var topBarTopPadding: CGFloat = 6
     @Published var modelPillHorizontalPadding: CGFloat = 14
     @Published var modelPillVerticalPadding: CGFloat = 8
@@ -49,14 +49,14 @@ class DebugSettings: ObservableObject {
         buttonSize = 34
         modelPillHeight = 32
         
-        inputBarSpacing = 5
-        topBarSpacing = 12
+        inputBarSpacing = 8
+        topBarSpacing = 8
         suggestionChipsSpacing = 12
         messageSpacing = 16
         
         inputBarHorizontalPadding = 16
         inputBarVerticalPadding = 12
-        topBarHorizontalPadding = 11
+        topBarHorizontalPadding = 16
         topBarTopPadding = 6
         modelPillHorizontalPadding = 14
         modelPillVerticalPadding = 8

@@ -229,9 +229,9 @@ struct HomeView: View {
 
     // MARK: Input Bar (Sticky Bottom)
     var inputBar: some View {
-        HStack(spacing: debugSettings.inputBarSpacing) {
+        HStack(spacing: 0) {
             // Left buttons group
-            HStack(spacing: debugSettings.inputBarSpacing) {
+            HStack(spacing: 6) {
                 // Plus button
                 Button { } label: {
                     Image(systemName: "plus")
@@ -250,6 +250,9 @@ struct HomeView: View {
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
             }
+            
+            Spacer()
+                .frame(width: 10)
 
             // Text input
             TextField("Ask anything", text: $inputText)
@@ -264,6 +267,9 @@ struct HomeView: View {
                 .frame(height: 44)
                 .background(Capsule().fill(.ultraThinMaterial))
                 .layoutPriority(-1)
+            
+            Spacer()
+                .frame(width: debugSettings.inputBarSpacing)
 
             // Send button
             if inputText.isEmpty {
