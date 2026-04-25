@@ -77,8 +77,8 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "pixtral",     name: "Pixtral 12B",    badge: nil,    apiProvider: "mistral", apiModel: "pixtral-12b-2409"),
     ]),
     AIProvider(id: "deepseek", name: "DeepSeek", icon: "magnifyingglass.circle.fill", colorHex: "#7B68EE", models: [
-        AIModel(id: "ds-r1",       name: "DeepSeek R1",    badge: "Think", apiProvider: "github", apiModel: "Deepseek-R1"),
-        AIModel(id: "ds-v3",       name: "DeepSeek V3",    badge: nil, apiProvider: "github", apiModel: "Deepseek-V3"),
+        AIModel(id: "ds-r1",       name: "DeepSeek R1",    badge: "Think", apiProvider: "github", apiModel: "DeepSeek-R1-0528"),
+        AIModel(id: "ds-v3",       name: "DeepSeek V3",    badge: nil, apiProvider: "github", apiModel: "DeepSeek-V3-0324"),
     ]),
     AIProvider(id: "llama", name: "Llama", icon: "hare.fill", colorHex: "#9B59B6", models: [
         AIModel(id: "llama-405b",  name: "Llama 3.1 405B", badge: "Pro",  apiProvider: "github", apiModel: "Meta-Llama-3.1-405B-Instruct"),
