@@ -12,7 +12,11 @@ struct HomeView: View {
     @State private var showImagePicker = false
     @State private var thinkingMode = false
     @FocusState private var inputFocused: Bool
-    @ObservedObject var debugSettings = DebugSettings.shared
+    @ObservedObject var debugSettings: DebugSettings
+    
+    init() {
+        _debugSettings = ObservedObject(wrappedValue: DebugSettings.shared)
+    }
 
     let suggestions = [
         ("Tell me", "something fascinating"),
@@ -336,47 +340,10 @@ struct HomeView: View {
             .padding(.bottom, 8)
         }
         .sheet(isPresented: $showImagePicker) {
-            MultiImagePicker(images: $selectedImages)
+            AppImagePicker(images: $selectedImages)
         }
     }
 }
 
 
-// MARK: - Multi Image Picker
-struct MultiImagePicker: UIViewControllerRepresentable {
-    @Binding var images: [UIImage]
-    @Environment(\.dismiss) var dismiss
-    
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
-        picker.sourceType = .photoLibrary
-        picker.allowsEditing = false
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: MultiImagePicker
-        
-        init(_ parent: MultiImagePicker) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                parent.images.append(image)
-            }
-            parent.dismiss()
-        }
-        
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.dismiss()
-        }
-    }
-}
+

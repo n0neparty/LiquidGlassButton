@@ -6,7 +6,7 @@ struct ChatView: View {
     let initialMessage: String
     var initialImages: [UIImage] = []
     var initialThinkingMode: Bool = false
-    
+
     @State private var messages: [ChatMessage] = []
     @State private var inputText = ""
     @State private var chatId: String?
@@ -15,33 +15,25 @@ struct ChatView: View {
     @State private var showImagePicker = false
     @State private var thinkingMode = false
     @FocusState private var inputFocused: Bool
-    @ObservedObject var debugSettings = DebugSettings.shared
     @Environment(\.dismiss) var dismiss
-    
+
+    // Use nonisolated(unsafe) to access @MainActor singleton in Swift 6
+    nonisolated(unsafe) static let settings = DebugSettings.shared
+    var ds: DebugSettings { ChatView.settings }
+
     var body: some View {
         ZStack {
-            // Black base
             Color.black.ignoresSafeArea()
-            
-            // Subtle radial gradient
             RadialGradient(
-                colors: [
-                    provider.color.opacity(0.2),
-                    provider.color.opacity(0.1),
-                    .clear
-                ],
-                center: .init(x: 0.5, y: 0.2),
-                startRadius: 0,
-                endRadius: 400
+                colors: [provider.color.opacity(0.2), provider.color.opacity(0.1), .clear],
+                center: .init(x: 0.5, y: 0.2), startRadius: 0, endRadius: 400
             )
-            .blur(radius: 90)
-            .ignoresSafeArea()
-            
+            .blur(radius: 90).ignoresSafeArea()
+
             VStack(spacing: 0) {
-                // Messages
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(spacing: debugSettings.messageSpacing) {
+                        LazyVStack(spacing: ds.messageSpacing) {
                             ForEach(messages) { msg in
                                 MessageBubble(message: msg, providerColor: provider.color)
                                     .id(msg.id)
@@ -58,23 +50,19 @@ struct ChatView: View {
                         }
                     }
                 }
-                
-                // Loading animation
+
                 if isLoading {
                     ThinkingAnimation(color: provider.color)
                         .padding(.bottom, 12)
                 }
-                
-                // Input bar
+
                 inputBar
             }
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
+                Button { dismiss() } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 14, weight: .semibold))
@@ -97,25 +85,19 @@ struct ChatView: View {
             }
         }
     }
-    
-    // MARK: Input Bar с системным liquid glass
+
     var inputBar: some View {
         VStack(spacing: 0) {
-            // Selected images preview
             if !selectedImages.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, image in
                             ZStack(alignment: .topTrailing) {
                                 Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFill()
+                                    .resizable().scaledToFill()
                                     .frame(width: 60, height: 60)
                                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                
-                                Button {
-                                    selectedImages.remove(at: index)
-                                } label: {
+                                Button { selectedImages.remove(at: index) } label: {
                                     Image(systemName: "xmark.circle.fill")
                                         .font(.system(size: 20))
                                         .foregroundStyle(.white)
@@ -125,39 +107,31 @@ struct ChatView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
+                    .padding(.horizontal, ds.inputBarHorizontalPadding)
                 }
                 .padding(.bottom, 8)
             }
-            
+
             HStack(spacing: 0) {
-                // Left buttons group
                 HStack(spacing: 6) {
-                    Button { 
-                        showImagePicker = true
-                    } label: {
+                    Button { showImagePicker = true } label: {
                         Image(systemName: "plus")
-                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                            .font(.system(size: ds.buttonIconSize, weight: .bold))
+                            .frame(width: ds.buttonSize, height: ds.buttonSize)
                     }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
-                    
-                    Button { 
-                        thinkingMode.toggle()
-                    } label: {
+                    .buttonStyle(.glass).buttonBorderShape(.circle)
+
+                    Button { thinkingMode.toggle() } label: {
                         Image(systemName: thinkingMode ? "lightbulb.fill" : "lightbulb")
-                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .font(.system(size: ds.buttonIconSize, weight: .bold))
                             .foregroundStyle(thinkingMode ? provider.color : .white)
-                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                            .frame(width: ds.buttonSize, height: ds.buttonSize)
                     }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
+                    .buttonStyle(.glass).buttonBorderShape(.circle)
                 }
-                
-                Spacer()
-                    .frame(width: 10)
-                
+
+                Spacer().frame(width: 10)
+
                 TextField("Ask anything", text: $inputText)
                     .font(.system(size: 16, weight: .regular))
                     .foregroundStyle(.white)
@@ -165,52 +139,46 @@ struct ChatView: View {
                     .focused($inputFocused)
                     .submitLabel(.send)
                     .onSubmit { sendMessage() }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 13)
+                    .padding(.horizontal, 18).padding(.vertical, 13)
                     .frame(height: 44)
                     .background(Capsule().fill(.ultraThinMaterial))
                     .layoutPriority(-1)
-                
-                Spacer()
-                    .frame(width: debugSettings.inputBarSpacing)
-                
-                // Send button
+
+                Spacer().frame(width: ds.inputBarSpacing)
+
                 if inputText.isEmpty {
                     Button { } label: {
                         Image(systemName: "arrow.up")
-                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .font(.system(size: ds.buttonIconSize, weight: .bold))
                             .foregroundStyle(.white)
-                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                            .frame(width: ds.buttonSize, height: ds.buttonSize)
                     }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
+                    .buttonStyle(.glass).buttonBorderShape(.circle)
                     .disabled(true)
-                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    .frame(width: ds.buttonSize, height: ds.buttonSize)
                     .layoutPriority(1)
                 } else {
-                    Button { 
-                        sendMessage()
-                    } label: {
+                    Button { sendMessage() } label: {
                         Image(systemName: "arrow.up")
-                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .font(.system(size: ds.buttonIconSize, weight: .bold))
                             .foregroundStyle(.black)
-                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                            .frame(width: ds.buttonSize, height: ds.buttonSize)
                     }
                     .buttonStyle(.plain)
                     .background(Circle().fill(.white))
-                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    .frame(width: ds.buttonSize, height: ds.buttonSize)
                     .layoutPriority(1)
                 }
             }
-            .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
-            .padding(.vertical, debugSettings.inputBarVerticalPadding)
+            .padding(.horizontal, ds.inputBarHorizontalPadding)
+            .padding(.vertical, ds.inputBarVerticalPadding)
             .padding(.bottom, 8)
         }
         .sheet(isPresented: $showImagePicker) {
-            MultiImagePicker(images: $selectedImages)
+            AppImagePicker(images: $selectedImages)
         }
     }
-    
+
     private func sendMessage() {
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let userMsg = inputText
@@ -220,81 +188,27 @@ struct ChatView: View {
         selectedImages = []
         messages.append(ChatMessage(role: .user, text: userMsg))
         isLoading = true
-        
+
         Task {
             do {
-                // If thinking mode is enabled, first send system prompt
                 if useThinking {
-                    let thinkingPrompt = "You are now in deep thinking mode. Before answering the user's question, you must think step by step about the problem. Analyze it carefully, consider different approaches, and reason through the solution. If you understand and are ready to think deeply, respond with exactly: 1337"
-                    
+                    let thinkingPrompt = "You are now in deep thinking mode. Think step by step. If you understand, respond with exactly: 1337"
                     let thinkingResponse = try await APIService.shared.sendMessage(
-                        model: model,
-                        message: thinkingPrompt,
-                        chatId: chatId,
-                        images: nil
+                        model: model, message: thinkingPrompt, chatId: chatId, image: nil
                     )
-                    
-                    // Update chatId from thinking response
-                    if let id = thinkingResponse.resolvedChatId {
-                        chatId = id
-                    }
-                    
-                    // Check if AI confirmed thinking mode
-                    if thinkingResponse.text?.contains("1337") == true {
-                        // Now send the actual user message in the same chat
-                        let response = try await APIService.shared.sendMessage(
-                            model: model,
-                            message: userMsg,
-                            chatId: chatId,
-                            images: imagesToSend
-                        )
-                        
-                        if let text = response.text {
-                            messages.append(ChatMessage(role: .ai, text: text))
-                        }
-                        if let id = response.resolvedChatId {
-                            chatId = id
-                        }
-                        if let error = response.error {
-                            messages.append(ChatMessage(role: .error, text: error))
-                        }
-                    } else {
-                        // Thinking mode activation failed, send normally
-                        let response = try await APIService.shared.sendMessage(
-                            model: model,
-                            message: userMsg,
-                            chatId: chatId,
-                            images: imagesToSend
-                        )
-                        
-                        if let text = response.text {
-                            messages.append(ChatMessage(role: .ai, text: text))
-                        }
-                        if let id = response.resolvedChatId {
-                            chatId = id
-                        }
-                        if let error = response.error {
-                            messages.append(ChatMessage(role: .error, text: error))
-                        }
-                    }
-                } else {
-                    // Normal mode - send message directly
+                    if let id = thinkingResponse.resolvedChatId { chatId = id }
+
                     let response = try await APIService.shared.sendMessage(
-                        model: model,
-                        message: userMsg,
-                        chatId: chatId,
-                        images: imagesToSend
+                        model: model, message: userMsg, chatId: chatId,
+                        image: imagesToSend.first
                     )
-                    
-                    if let text = response.text {
-                        messages.append(ChatMessage(role: .ai, text: text))
-                    }
-                    if let id = response.resolvedChatId {
-                        chatId = id
-                    }
-                    if let error = response.error {
-                        messages.append(ChatMessage(role: .error, text: error))
-                    }
+                    handleResponse(response)
+                } else {
+                    let response = try await APIService.shared.sendMessage(
+                        model: model, message: userMsg, chatId: chatId,
+                        image: imagesToSend.first
+                    )
+                    handleResponse(response)
                 }
             } catch {
                 messages.append(ChatMessage(role: .error, text: "Error: \(error.localizedDescription)"))
@@ -302,25 +216,28 @@ struct ChatView: View {
             isLoading = false
         }
     }
+
+    private func handleResponse(_ response: ChatResponse) {
+        if let text = response.text { messages.append(ChatMessage(role: .ai, text: text)) }
+        if let id = response.resolvedChatId { chatId = id }
+        if let error = response.error { messages.append(ChatMessage(role: .error, text: error)) }
+    }
 }
 
 // MARK: - Thinking Animation
 struct ThinkingAnimation: View {
     let color: Color
     @State private var phase: CGFloat = 0
-    
+
     var body: some View {
         HStack(spacing: 6) {
             ForEach(0..<3) { index in
-                Circle()
-                    .fill(color)
-                    .frame(width: 8, height: 8)
+                Circle().fill(color).frame(width: 8, height: 8)
                     .scaleEffect(scale(for: index))
                     .opacity(opacity(for: index))
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16).padding(.vertical, 10)
         .background(.ultraThinMaterial, in: Capsule())
         .onAppear {
             withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
@@ -328,15 +245,14 @@ struct ThinkingAnimation: View {
             }
         }
     }
-    
+
     private func scale(for index: Int) -> CGFloat {
-        let progress = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
-        return 1 + sin(progress * .pi) * 0.5
+        let p = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
+        return 1 + sin(p * .pi) * 0.5
     }
-    
     private func opacity(for index: Int) -> Double {
-        let progress = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
-        return 0.4 + sin(progress * .pi) * 0.6
+        let p = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
+        return 0.4 + sin(p * .pi) * 0.6
     }
 }
 
@@ -344,34 +260,29 @@ struct ThinkingAnimation: View {
 struct MessageBubble: View {
     let message: ChatMessage
     let providerColor: Color
-    @ObservedObject var debugSettings = DebugSettings.shared
-    
+
+    nonisolated(unsafe) static let settings = DebugSettings.shared
+    var ds: DebugSettings { MessageBubble.settings }
+
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            if message.role == .user {
-                Spacer(minLength: 60)
-            }
-            
+            if message.role == .user { Spacer(minLength: 60) }
             Text(message.text)
-                .font(.system(size: debugSettings.messageTextSize, weight: .regular))
+                .font(.system(size: ds.messageTextSize, weight: .regular))
                 .foregroundStyle(message.role == .error ? .red : .white)
-                .padding(.horizontal, debugSettings.messageBubbleHorizontalPadding)
-                .padding(.vertical, debugSettings.messageBubbleVerticalPadding)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: debugSettings.messageBubbleCornerRadius, style: .continuous))
-            
-            if message.role != .user {
-                Spacer(minLength: 60)
-            }
+                .padding(.horizontal, ds.messageBubbleHorizontalPadding)
+                .padding(.vertical, ds.messageBubbleVerticalPadding)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
+            if message.role != .user { Spacer(minLength: 60) }
         }
     }
 }
 
-
-// MARK: - Multi Image Picker
-struct MultiImagePicker: UIViewControllerRepresentable {
+// MARK: - Image Picker
+struct AppImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
     @Environment(\.dismiss) var dismiss
-    
+
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
@@ -379,29 +290,18 @@ struct MultiImagePicker: UIViewControllerRepresentable {
         picker.allowsEditing = false
         return picker
     }
-    
+
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: MultiImagePicker
-        
-        init(_ parent: MultiImagePicker) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                parent.images.append(image)
-            }
+        let parent: AppImagePicker
+        init(_ parent: AppImagePicker) { self.parent = parent }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            if let image = info[.originalImage] as? UIImage { parent.images.append(image) }
             parent.dismiss()
         }
-        
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.dismiss()
-        }
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { parent.dismiss() }
     }
 }

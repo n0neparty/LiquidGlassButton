@@ -4,7 +4,13 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var selectedProvider: AIProvider
     @Binding var selectedModel: AIModel
-    @ObservedObject var debugSettings = DebugSettings.shared
+    @ObservedObject var debugSettings: DebugSettings
+    
+    init(selectedProvider: Binding<AIProvider>, selectedModel: Binding<AIModel>) {
+        _selectedProvider = selectedProvider
+        _selectedModel = selectedModel
+        _debugSettings = ObservedObject(wrappedValue: DebugSettings.shared)
+    }
     
     var body: some View {
         NavigationStack {
