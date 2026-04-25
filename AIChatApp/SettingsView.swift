@@ -45,30 +45,30 @@ struct SettingsView: View {
                                     } label: {
                                         HStack(spacing: 12) {
                                             Image(systemName: provider.icon)
-                                                .font(.system(size: 16, weight: .semibold))
+                                                .font(.system(size: 18, weight: .semibold))
                                                 .foregroundStyle(provider.color)
-                                                .frame(width: 32, height: 32)
+                                                .frame(width: 36, height: 36)
                                                 .background(provider.color.opacity(0.15))
-                                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                             
                                             Text(provider.name)
-                                                .font(.system(size: 15, weight: .medium))
+                                                .font(.system(size: 16, weight: .medium))
                                                 .foregroundStyle(.white)
                                             
                                             Spacer()
                                             
                                             if selectedProvider.id == provider.id {
                                                 Image(systemName: "checkmark.circle.fill")
-                                                    .font(.system(size: 18))
+                                                    .font(.system(size: 20))
                                                     .foregroundStyle(provider.color)
                                                     .transition(.scale.combined(with: .opacity))
                                             }
                                         }
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 12)
                                     }
                                     .buttonStyle(.glass)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 }
                             }
                             .padding(.horizontal, 16)
@@ -89,25 +89,25 @@ struct SettingsView: View {
                                         }
                                     } label: {
                                         HStack(spacing: 12) {
-                                            VStack(alignment: .leading, spacing: 3) {
+                                            VStack(alignment: .leading, spacing: 4) {
                                                 HStack(spacing: 6) {
                                                     Text(model.name)
-                                                        .font(.system(size: 14, weight: .medium))
+                                                        .font(.system(size: 15, weight: .medium))
                                                         .foregroundStyle(.white)
                                                     
                                                     if let badge = model.badge {
                                                         Text(badge)
-                                                            .font(.system(size: 9, weight: .bold))
+                                                            .font(.system(size: 10, weight: .bold))
                                                             .foregroundStyle(selectedProvider.color)
-                                                            .padding(.horizontal, 5)
-                                                            .padding(.vertical, 2)
+                                                            .padding(.horizontal, 6)
+                                                            .padding(.vertical, 3)
                                                             .background(selectedProvider.color.opacity(0.2))
                                                             .clipShape(Capsule())
                                                     }
                                                 }
                                                 
                                                 Text("\(model.apiProvider) • \(model.apiModel)")
-                                                    .font(.system(size: 11, weight: .regular))
+                                                    .font(.system(size: 12, weight: .regular))
                                                     .foregroundStyle(.white.opacity(0.4))
                                             }
                                             
@@ -115,16 +115,16 @@ struct SettingsView: View {
                                             
                                             if selectedModel.id == model.id {
                                                 Image(systemName: "checkmark.circle.fill")
-                                                    .font(.system(size: 18))
+                                                    .font(.system(size: 20))
                                                     .foregroundStyle(selectedProvider.color)
                                                     .transition(.scale.combined(with: .opacity))
                                             }
                                         }
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 12)
                                     }
                                     .buttonStyle(.glass)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 }
                             }
                             .padding(.horizontal, 16)
