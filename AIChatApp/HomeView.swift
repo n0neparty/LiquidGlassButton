@@ -7,7 +7,6 @@ struct HomeView: View {
     @State private var inputText = ""
     @State private var navigateToChat = false
     @State private var showSettings = false
-    @State private var isLoadingModel = true
     @State private var selectedImages: [UIImage] = []
     @State private var showImagePicker = false
     @State private var thinkingMode = false
@@ -45,13 +44,7 @@ struct HomeView: View {
                 VStack(spacing: 0) {
                     topBar
                     Spacer()
-                    
-                    if isLoadingModel {
-                        loadingView
-                    } else {
-                        centerTitle
-                    }
-                    
+                    centerTitle
                     Spacer()
                     suggestionChips
                     inputBar
@@ -69,11 +62,6 @@ struct HomeView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .task {
-            // Simulate model loading
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
-            withAnimation(.easeInOut(duration: 0.6)) { isLoadingModel = false }
-        }
     }
 
     // MARK: Top Bar (Header) с настоящим liquid glass
@@ -140,41 +128,6 @@ struct HomeView: View {
         }
         .padding(.horizontal, debugSettings.topBarHorizontalPadding)
         .padding(.top, debugSettings.topBarTopPadding)
-    }
-
-    // MARK: Loading View
-    var loadingView: some View {
-        VStack(spacing: 20) {
-            Text("Meet \(selectedProvider.name)")
-                .font(.system(size: 38, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-
-            Text("Run \(selectedProvider.name)'s ultra-efficient model locally — built for fast on-device performance.")
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(.white.opacity(0.5))
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-                .padding(.horizontal, 40)
-            
-            // Loading indicator с настоящим liquid glass
-            Button { } label: {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white.opacity(0.6)))
-                        .scaleEffect(0.8)
-                    Text("Loading model...")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.6))
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-            }
-            .buttonStyle(.glass)
-            .disabled(true)
-            .padding(.top, 20)
-        }
-        .padding(.horizontal, 32)
     }
 
     // MARK: Center Title (Main Hero Section)
