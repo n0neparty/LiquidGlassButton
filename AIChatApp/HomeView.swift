@@ -8,6 +8,9 @@ struct HomeView: View {
     @State private var navigateToChat = false
     @State private var showSettings = false
     @State private var isLoadingModel = true
+    @State private var selectedImages: [UIImage] = []
+    @State private var showImagePicker = false
+    @State private var thinkingMode = false
     @FocusState private var inputFocused: Bool
     @ObservedObject var debugSettings = DebugSettings.shared
 
@@ -55,7 +58,11 @@ struct HomeView: View {
                 }
             }
             .navigationDestination(isPresented: $navigateToChat) {
-                ChatView(provider: selectedProvider, model: selectedModel, initialMessage: inputText)
+                ChatView(provider: selectedProvider, model: selectedModel, initialMessage: inputText, initialImages: selectedImages, initialThinkingMode: thinkingMode)
+                    .onAppear {
+                        selectedImages = []
+                        thinkingMode = false
+                    }
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView(selectedProvider: $selectedProvider, selectedModel: $selectedModel)
@@ -219,78 +226,157 @@ struct HomeView: View {
 
     // MARK: Input Bar (Sticky Bottom)
     var inputBar: some View {
-        HStack(spacing: 0) {
-            // Left buttons group
-            HStack(spacing: 6) {
-                // Plus button
-                Button { } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+        VStack(spacing: 0) {
+            // Selected images preview
+            if !selectedImages.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, image in
+                            ZStack(alignment: .topTrailing) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                
+                                Button {
+                                    selectedImages.remove(at: index)
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(.white)
+                                        .background(Circle().fill(.black.opacity(0.5)))
+                                }
+                                .offset(x: 6, y: -6)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
                 }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
+                .padding(.bottom, 8)
+            }
+            
+            HStack(spacing: 0) {
+                // Left buttons group
+                HStack(spacing: 6) {
+                    // Plus button
+                    Button { 
+                        showImagePicker = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    
+                    // Lightbulb button
+                    Button { 
+                        thinkingMode.toggle()
+                    } label: {
+                        Image(systemName: thinkingMode ? "lightbulb.fill" : "lightbulb")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(thinkingMode ? selectedProvider.color : .white)
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                }
                 
-                // Lightbulb button
-                Button { } label: {
-                    Image(systemName: "lightbulb.fill")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-            }
-            
-            Spacer()
-                .frame(width: 10)
+                Spacer()
+                    .frame(width: 10)
 
-            // Text input
-            TextField("Ask anything", text: $inputText)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(.white)
-                .tint(selectedProvider.color)
-                .focused($inputFocused)
-                .submitLabel(.send)
-                .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 13)
-                .frame(height: 44)
-                .background(Capsule().fill(.ultraThinMaterial))
-                .layoutPriority(-1)
-            
-            Spacer()
-                .frame(width: debugSettings.inputBarSpacing)
+                // Text input
+                TextField("Ask anything", text: $inputText)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.white)
+                    .tint(selectedProvider.color)
+                    .focused($inputFocused)
+                    .submitLabel(.send)
+                    .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 13)
+                    .frame(height: 44)
+                    .background(Capsule().fill(.ultraThinMaterial))
+                    .layoutPriority(-1)
+                
+                Spacer()
+                    .frame(width: debugSettings.inputBarSpacing)
 
-            // Send button
-            if inputText.isEmpty {
-                Button { } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                // Send button
+                if inputText.isEmpty {
+                    Button { } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    .disabled(true)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    .layoutPriority(1)
+                } else {
+                    Button {
+                        navigateToChat = true
+                    } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(.black)
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.plain)
+                    .background(Circle().fill(.white))
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    .layoutPriority(1)
                 }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .disabled(true)
-                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                .layoutPriority(1)
-            } else {
-                Button {
-                    navigateToChat = true
-                } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.black)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                }
-                .buttonStyle(.plain)
-                .background(Circle().fill(.white))
-                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                .layoutPriority(1)
             }
+            .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
+            .padding(.vertical, debugSettings.inputBarVerticalPadding)
+            .padding(.bottom, 8)
         }
-        .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
-        .padding(.vertical, debugSettings.inputBarVerticalPadding)
-        .padding(.bottom, 8)
+        .sheet(isPresented: $showImagePicker) {
+            MultiImagePicker(images: $selectedImages)
+        }
+    }
+}
+
+
+// MARK: - Multi Image Picker
+struct MultiImagePicker: UIViewControllerRepresentable {
+    @Binding var images: [UIImage]
+    @Environment(\.dismiss) var dismiss
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.delegate = context.coordinator
+        picker.sourceType = .photoLibrary
+        picker.allowsEditing = false
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: MultiImagePicker
+        
+        init(_ parent: MultiImagePicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.images.append(image)
+            }
+            parent.dismiss()
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.dismiss()
+        }
     }
 }

@@ -4,12 +4,14 @@ struct ChatView: View {
     let provider: AIProvider
     let model: AIModel
     let initialMessage: String
+    var initialImages: [UIImage] = []
+    var initialThinkingMode: Bool = false
     
     @State private var messages: [ChatMessage] = []
     @State private var inputText = ""
     @State private var chatId: String?
     @State private var isLoading = false
-    @State private var selectedImage: UIImage?
+    @State private var selectedImages: [UIImage] = []
     @State private var showImagePicker = false
     @State private var thinkingMode = false
     @FocusState private var inputFocused: Bool
@@ -87,6 +89,8 @@ struct ChatView: View {
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
         .task {
+            thinkingMode = initialThinkingMode
+            selectedImages = initialImages
             if !initialMessage.isEmpty {
                 inputText = initialMessage
                 sendMessage()
@@ -97,26 +101,32 @@ struct ChatView: View {
     // MARK: Input Bar с системным liquid glass
     var inputBar: some View {
         VStack(spacing: 0) {
-            // Selected image preview
-            if let image = selectedImage {
-                HStack {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 60, height: 60)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    
-                    Spacer()
-                    
-                    Button {
-                        selectedImage = nil
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.white.opacity(0.6))
+            // Selected images preview
+            if !selectedImages.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, image in
+                            ZStack(alignment: .topTrailing) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                
+                                Button {
+                                    selectedImages.remove(at: index)
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(.white)
+                                        .background(Circle().fill(.black.opacity(0.5)))
+                                }
+                                .offset(x: 6, y: -6)
+                            }
+                        }
                     }
+                    .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
                 }
-                .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
                 .padding(.bottom, 8)
             }
             
@@ -138,17 +148,11 @@ struct ChatView: View {
                     } label: {
                         Image(systemName: thinkingMode ? "lightbulb.fill" : "lightbulb")
                             .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(thinkingMode ? provider.color : .white)
                             .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                     }
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
-                    .overlay(
-                        thinkingMode ? 
-                        Circle()
-                            .stroke(provider.color, lineWidth: 2)
-                            .frame(width: debugSettings.buttonSize + 4, height: debugSettings.buttonSize + 4)
-                        : nil
-                    )
                 }
                 
                 Spacer()
@@ -203,17 +207,17 @@ struct ChatView: View {
             .padding(.bottom, 8)
         }
         .sheet(isPresented: $showImagePicker) {
-            ImagePicker(image: $selectedImage)
+            MultiImagePicker(images: $selectedImages)
         }
     }
     
     private func sendMessage() {
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let userMsg = inputText
-        let imageToSend = selectedImage
+        let imagesToSend = selectedImages
         let useThinking = thinkingMode
         inputText = ""
-        selectedImage = nil
+        selectedImages = []
         messages.append(ChatMessage(role: .user, text: userMsg))
         isLoading = true
         
@@ -227,7 +231,7 @@ struct ChatView: View {
                         model: model,
                         message: thinkingPrompt,
                         chatId: chatId,
-                        image: nil
+                        images: nil
                     )
                     
                     // Update chatId from thinking response
@@ -242,7 +246,7 @@ struct ChatView: View {
                             model: model,
                             message: userMsg,
                             chatId: chatId,
-                            image: imageToSend
+                            images: imagesToSend
                         )
                         
                         if let text = response.text {
@@ -260,7 +264,7 @@ struct ChatView: View {
                             model: model,
                             message: userMsg,
                             chatId: chatId,
-                            image: imageToSend
+                            images: imagesToSend
                         )
                         
                         if let text = response.text {
@@ -279,7 +283,7 @@ struct ChatView: View {
                         model: model,
                         message: userMsg,
                         chatId: chatId,
-                        image: imageToSend
+                        images: imagesToSend
                     )
                     
                     if let text = response.text {
@@ -363,9 +367,9 @@ struct MessageBubble: View {
 }
 
 
-// MARK: - Image Picker
-struct ImagePicker: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
+// MARK: - Multi Image Picker
+struct MultiImagePicker: UIViewControllerRepresentable {
+    @Binding var images: [UIImage]
     @Environment(\.dismiss) var dismiss
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
@@ -383,15 +387,15 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: ImagePicker
+        let parent: MultiImagePicker
         
-        init(_ parent: ImagePicker) {
+        init(_ parent: MultiImagePicker) {
             self.parent = parent
         }
         
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
-                parent.image = image
+                parent.images.append(image)
             }
             parent.dismiss()
         }

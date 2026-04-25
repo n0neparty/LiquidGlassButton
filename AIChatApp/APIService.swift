@@ -5,7 +5,7 @@ final class APIService: Sendable {
     static let shared = APIService()
     private init() {}
 
-    func sendMessage(model: AIModel, message: String, chatId: String?, image: UIImage? = nil) async throws -> ChatResponse {
+    func sendMessage(model: AIModel, message: String, chatId: String?, images: [UIImage]? = nil) async throws -> ChatResponse {
         guard let url = URL(string: "\(API_BASE)/api/\(model.apiProvider)") else {
             throw URLError(.badURL)
         }
@@ -18,10 +18,21 @@ final class APIService: Sendable {
         if let chatId { body["chatId"] = chatId }
         if let conversationId = chatId { body["conversationId"] = conversationId }
         
-        // If image is provided, convert to base64
-        if let image = image, let imageData = image.jpegData(compressionQuality: 0.8) {
-            let base64String = imageData.base64EncodedString()
-            body["image"] = "data:image/jpeg;base64,\(base64String)"
+        // If images are provided, convert to base64 array
+        if let images = images, !images.isEmpty {
+            var base64Images: [String] = []
+            for image in images {
+                if let imageData = image.jpegData(compressionQuality: 0.8) {
+                    let base64String = imageData.base64EncodedString()
+                    base64Images.append("data:image/jpeg;base64,\(base64String)")
+                }
+            }
+            if !base64Images.isEmpty {
+                // Send first image in "image" field for backward compatibility
+                body["image"] = base64Images[0]
+                // Send all images in "images" array
+                body["images"] = base64Images
+            }
         }
         
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
