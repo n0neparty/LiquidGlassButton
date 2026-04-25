@@ -110,21 +110,17 @@ struct ChatView: View {
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
             
-            ZStack {
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                
-                TextField("Ask anything", text: $inputText)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.white)
-                    .tint(provider.color)
-                    .focused($inputFocused)
-                    .submitLabel(.send)
-                    .onSubmit { sendMessage() }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 13)
-            }
-            .frame(height: 44)
+            TextField("Ask anything", text: $inputText)
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(.white)
+                .tint(provider.color)
+                .focused($inputFocused)
+                .submitLabel(.send)
+                .onSubmit { sendMessage() }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 13)
+                .frame(height: 44)
+                .background(Capsule().fill(.ultraThinMaterial))
             
             // Send button
             ZStack {

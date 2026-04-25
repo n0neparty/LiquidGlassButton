@@ -249,21 +249,17 @@ struct HomeView: View {
             .buttonBorderShape(.circle)
 
             // Text input
-            ZStack {
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                
-                TextField("Ask anything", text: $inputText)
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.white)
-                    .tint(selectedProvider.color)
-                    .focused($inputFocused)
-                    .submitLabel(.send)
-                    .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 13)
-            }
-            .frame(height: 44)
+            TextField("Ask anything", text: $inputText)
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(.white)
+                .tint(selectedProvider.color)
+                .focused($inputFocused)
+                .submitLabel(.send)
+                .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 13)
+                .frame(height: 44)
+                .background(Capsule().fill(.ultraThinMaterial))
 
             // Send button
             ZStack {
