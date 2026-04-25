@@ -1,29 +1,5 @@
 import SwiftUI
 
-// MARK: - Glassmorphic modifier (Real iOS implementation)
-struct GlassmorphicCard: ViewModifier {
-    var cornerRadius: CGFloat = 16
-    var borderColor: Color = .white.opacity(0.1)
-    
-    func body(content: Content) -> some View {
-        content
-            .background {
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .stroke(borderColor, lineWidth: 1)
-                    }
-            }
-    }
-}
-
-extension View {
-    func glassmorphic(cornerRadius: CGFloat = 16, borderColor: Color = .white.opacity(0.1)) -> some View {
-        modifier(GlassmorphicCard(cornerRadius: cornerRadius, borderColor: borderColor))
-    }
-}
-
 // MARK: - HomeView
 struct HomeView: View {
     @State private var selectedProvider = ALL_PROVIDERS[0]
@@ -101,8 +77,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .glassmorphic(cornerRadius: 12)
 
             // History button
             Button { } label: {
@@ -110,8 +86,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .glassmorphic(cornerRadius: 12)
 
             Spacer()
 
@@ -136,8 +112,8 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
+                .background(.ultraThinMaterial, in: Capsule())
             }
-            .glassmorphic(cornerRadius: 20, borderColor: selectedProvider.color.opacity(0.3))
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
             Spacer()
@@ -148,8 +124,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .glassmorphic(cornerRadius: 12)
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -181,7 +157,7 @@ struct HomeView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
-            .glassmorphic(cornerRadius: 20)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             .padding(.top, 20)
         }
         .padding(.horizontal, 32)
@@ -223,8 +199,8 @@ struct HomeView: View {
                         }
                         .frame(width: 160, alignment: .leading)
                         .padding(16)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                     }
-                    .glassmorphic(cornerRadius: 20)
                 }
             }
             .padding(.horizontal, 16)
@@ -241,8 +217,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .glassmorphic(cornerRadius: 22)
             
             // Lightbulb button
             Button { } label: {
@@ -250,8 +226,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .glassmorphic(cornerRadius: 22)
 
             // Text input
             TextField("Ask anything", text: $inputText)
@@ -263,9 +239,9 @@ struct HomeView: View {
                 .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 13)
-                .glassmorphic(cornerRadius: 24)
+                .background(.ultraThinMaterial, in: Capsule())
 
-            // Send button
+            // Send button - полностью белая
             Button {
                 guard !inputText.isEmpty else { return }
                 navigateToChat = true
@@ -276,18 +252,9 @@ struct HomeView: View {
                     .frame(width: 44, height: 44)
                     .background {
                         if inputText.isEmpty {
-                            Circle()
-                                .fill(.ultraThinMaterial)
-                                .overlay {
-                                    Circle().stroke(Color.white.opacity(0.1), lineWidth: 1)
-                                }
+                            Circle().fill(.ultraThinMaterial)
                         } else {
-                            Circle()
-                                .fill(LinearGradient(
-                                    colors: [.white, selectedProvider.color.opacity(0.2)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ))
+                            Circle().fill(.white)
                         }
                     }
             }

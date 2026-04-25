@@ -75,16 +75,16 @@ struct ChatView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .glassmorphic(cornerRadius: 22)
             
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .glassmorphic(cornerRadius: 22)
             
             TextField("Ask anything", text: $inputText)
                 .font(.system(size: 16, weight: .regular))
@@ -95,21 +95,14 @@ struct ChatView: View {
                 .onSubmit { sendMessage() }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 13)
-                .glassmorphic(cornerRadius: 24)
+                .background(.ultraThinMaterial, in: Capsule())
             
             Button { sendMessage() } label: {
                 if isLoading {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .black))
                         .frame(width: 44, height: 44)
-                        .background {
-                            Circle()
-                                .fill(LinearGradient(
-                                    colors: [.white, provider.color.opacity(0.3)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ))
-                        }
+                        .background(Circle().fill(.white))
                 } else {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 17, weight: .bold))
@@ -117,18 +110,9 @@ struct ChatView: View {
                         .frame(width: 44, height: 44)
                         .background {
                             if inputText.isEmpty {
-                                Circle()
-                                    .fill(.ultraThinMaterial)
-                                    .overlay {
-                                        Circle().stroke(Color.white.opacity(0.1), lineWidth: 1)
-                                    }
+                                Circle().fill(.ultraThinMaterial)
                             } else {
-                                Circle()
-                                    .fill(LinearGradient(
-                                        colors: [.white, provider.color.opacity(0.3)],
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    ))
+                                Circle().fill(.white)
                             }
                         }
                 }
@@ -189,19 +173,7 @@ struct MessageBubble: View {
                 .foregroundStyle(message.role == .error ? .red : .white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .background {
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .stroke(
-                                    message.role == .user
-                                    ? providerColor.opacity(0.3)
-                                    : Color.white.opacity(0.1),
-                                    lineWidth: 1
-                                )
-                        }
-                }
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             
             if message.role != .user {
                 Spacer(minLength: 60)

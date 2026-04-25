@@ -66,13 +66,8 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 14)
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     }
-                                    .glassmorphic(
-                                        cornerRadius: 14,
-                                        borderColor: selectedProvider.id == provider.id
-                                        ? provider.color.opacity(0.3)
-                                        : Color.white.opacity(0.1)
-                                    )
                                 }
                             }
                             .padding(.horizontal, 16)
@@ -126,13 +121,8 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 14)
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     }
-                                    .glassmorphic(
-                                        cornerRadius: 14,
-                                        borderColor: selectedModel.id == model.id
-                                        ? selectedProvider.color.opacity(0.3)
-                                        : Color.white.opacity(0.1)
-                                    )
                                 }
                             }
                             .padding(.horizontal, 16)
