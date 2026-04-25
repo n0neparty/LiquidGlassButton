@@ -260,7 +260,8 @@ struct HomeView: View {
                     .focused($inputFocused)
                     .submitLabel(.send)
                     .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
-                    .padding(.horizontal, 18)
+                    .padding(.leading, 18)
+                    .padding(.trailing, 50)
                     .padding(.vertical, 13)
             }
             .frame(height: 44)

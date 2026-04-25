@@ -121,7 +121,8 @@ struct ChatView: View {
                     .focused($inputFocused)
                     .submitLabel(.send)
                     .onSubmit { sendMessage() }
-                    .padding(.horizontal, 18)
+                    .padding(.leading, 18)
+                    .padding(.trailing, 50)
                     .padding(.vertical, 13)
             }
             .frame(height: 44)
