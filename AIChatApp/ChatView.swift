@@ -572,12 +572,12 @@ struct LaTeXConverter {
             "t":"ᵗ","u":"ᵘ","v":"ᵛ","w":"ʷ","x":"ˣ","y":"ʸ","z":"ᶻ","+":"⁺","-":"⁻"
         ]
         var result = s
-        result = result.replacingOccurrences(of: #"\^\{([^}]+)\}"#, with: { m in
+        result = result.replacingMatches(of: #"\^\{([^}]+)\}"#) { m in
             m.dropFirst(2).dropLast().map { map[$0] ?? String($0) }.joined()
-        }, options: .regularExpression)
-        result = result.replacingOccurrences(of: #"\^([0-9a-zA-Z])"#, with: { m in
+        }
+        result = result.replacingMatches(of: #"\^([0-9a-zA-Z])"#) { m in
             map[m.last!] ?? String(m.last!)
-        }, options: .regularExpression)
+        }
         return result
     }
 
@@ -588,19 +588,19 @@ struct LaTeXConverter {
             "m":"ₘ","p":"ₚ","r":"ᵣ","s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","+":"₊","-":"₋"
         ]
         var result = s
-        result = result.replacingOccurrences(of: #"_\{([^}]+)\}"#, with: { m in
+        result = result.replacingMatches(of: #"_\{([^}]+)\}"#) { m in
             m.dropFirst(2).dropLast().map { map[$0] ?? String($0) }.joined()
-        }, options: .regularExpression)
-        result = result.replacingOccurrences(of: #"_([0-9a-zA-Z])"#, with: { m in
+        }
+        result = result.replacingMatches(of: #"_([0-9a-zA-Z])"#) { m in
             map[m.last!] ?? String(m.last!)
-        }, options: .regularExpression)
+        }
         return result
     }
 }
 
 // MARK: - String regex helper
-private extension String {
-    func replacingOccurrences(of pattern: String, with transform: (String) -> String, options: String.CompareOptions) -> String {
+extension String {
+    func replacingMatches(of pattern: String, with transform: (String) -> String) -> String {
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return self }
         let results = regex.matches(in: self, range: NSRange(self.startIndex..., in: self))
         var result = self
