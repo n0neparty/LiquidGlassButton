@@ -71,22 +71,22 @@ struct HomeView: View {
     // MARK: Top Bar (Header)
     var topBar: some View {
         HStack(spacing: 12) {
-            // Settings button
+            // Settings button - круглая
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background(Color.white.opacity(0.1), in: Circle())
             }
 
-            // History button
+            // History button - круглая
             Button { } label: {
                 Image(systemName: "bubble.left.fill")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background(Color.white.opacity(0.1), in: Circle())
             }
 
             Spacer()
@@ -112,19 +112,19 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background(.ultraThinMaterial, in: Capsule())
+                .background(Color.white.opacity(0.1), in: Capsule())
             }
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
             Spacer()
 
-            // New chat button
+            // New chat button - круглая
             Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background(Color.white.opacity(0.1), in: Circle())
             }
         }
         .padding(.horizontal, 16)
@@ -157,7 +157,7 @@ struct HomeView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             .padding(.top, 20)
         }
         .padding(.horizontal, 32)
@@ -199,7 +199,7 @@ struct HomeView: View {
                         }
                         .frame(width: 160, alignment: .leading)
                         .padding(16)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                     }
                 }
             }

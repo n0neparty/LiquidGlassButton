@@ -75,7 +75,7 @@ struct ChatView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background(Color.white.opacity(0.1), in: Circle())
             }
             
             Button { } label: {
@@ -83,7 +83,7 @@ struct ChatView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background(Color.white.opacity(0.1), in: Circle())
             }
             
             TextField("Ask anything", text: $inputText)
@@ -95,7 +95,7 @@ struct ChatView: View {
                 .onSubmit { sendMessage() }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 13)
-                .background(.ultraThinMaterial, in: Capsule())
+                .background(Color.white.opacity(0.1), in: Capsule())
             
             Button { sendMessage() } label: {
                 if isLoading {
@@ -110,7 +110,7 @@ struct ChatView: View {
                         .frame(width: 44, height: 44)
                         .background {
                             if inputText.isEmpty {
-                                Circle().fill(.ultraThinMaterial)
+                                Circle().fill(Color.white.opacity(0.1))
                             } else {
                                 Circle().fill(.white)
                             }
@@ -173,7 +173,7 @@ struct MessageBubble: View {
                 .foregroundStyle(message.role == .error ? .red : .white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             
             if message.role != .user {
                 Spacer(minLength: 60)
