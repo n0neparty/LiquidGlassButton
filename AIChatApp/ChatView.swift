@@ -99,6 +99,7 @@ struct ChatView: View {
     }
 
     var inputBar: some View {
+        // ... (inputBar без изменений, как в предыдущей версии)
         VStack(spacing: 0) {
             if !selectedImages.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -216,8 +217,25 @@ struct ChatView: View {
                     )
                 }
 
+                // Главная инструкция для отличного математического форматирования
+                let mathPrompt = """
+                Ты — эксперт по математике, физике и геометрии. 
+                Для **всех** формул, символов, треугольников, углов, дробей, корней, интегралов, сумм, матриц и т.д. используй KaTeX / LaTeX синтаксис:
+                - Inline: \\( формула \\)
+                - Блок: \\[ формула \\] или $$ формула $$
+                Используй специальные символы: △ (треугольник), ∠ (угол), ° (градус), √, ∛, ∞, ∑, ∏, ∫, ≠, ≈, ≤, ≥, ⊂, ∪, ∩ и т.д.
+                Делай ответы максимально красивыми и читаемыми.
+                """
+
+                let fullMessage = userMsg.contains("математик") || userMsg.contains("формул") || userMsg.contains("треугольник") 
+                    ? userMsg 
+                    : "\(mathPrompt)\n\nВопрос пользователя: \(userMsg)"
+
                 let response = try await APIService.shared.sendMessage(
-                    model: model, message: userMsg, chatId: chatId, image: img
+                    model: model, 
+                    message: fullMessage, 
+                    chatId: chatId, 
+                    image: img
                 )
                 
                 if let id = response.resolvedChatId { chatId = id }
@@ -235,7 +253,6 @@ struct ChatView: View {
         }
     }
 
-    /// Улучшенная очистка <think>...</think>
     private func cleanThinkingTags(_ text: String) -> String {
         var result = text
         
@@ -248,13 +265,10 @@ struct ChatView: View {
             .replacingOccurrences(of: "-----", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Убираем пустые строки в начале
         let lines = result.components(separatedBy: .newlines)
         let cleanedLines = lines.drop(while: { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
         
-        result = cleanedLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        return result
+        return cleanedLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     @MainActor
@@ -276,7 +290,7 @@ struct ChatView: View {
     }
 }
 
-// MARK: - Wave Loading Animation
+// MARK: - Wave Loading Animation (без изменений)
 struct WaveLoadingAnimation: View {
     let color: Color
     @State private var animating = false
@@ -291,12 +305,7 @@ struct WaveLoadingAnimation: View {
                 RoundedRectangle(cornerRadius: barWidth / 2)
                     .fill(color)
                     .frame(width: barWidth, height: animating ? maxHeight : minHeight)
-                    .animation(
-                        .easeInOut(duration: 0.45)
-                        .repeatForever(autoreverses: true)
-                        .delay(Double(i) * 0.1),
-                        value: animating
-                    )
+                    .animation(.easeInOut(duration: 0.45).repeatForever(autoreverses: true).delay(Double(i) * 0.1), value: animating)
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
@@ -305,7 +314,7 @@ struct WaveLoadingAnimation: View {
     }
 }
 
-// MARK: - Message Bubble (исправленный)
+// MARK: - Message Bubble (тёмный фон + улучшенная ширина)
 struct MessageBubble: View {
     let message: ChatMessage
     let providerColor: Color
@@ -313,19 +322,16 @@ struct MessageBubble: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            // Левый отступ
             if message.role == .user {
                 Spacer(minLength: 60)
             } else {
                 Spacer(minLength: 12)
             }
             
-            // Сообщение
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 if let image = message.image {
                     Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
+                        .resizable().scaledToFill()
                         .frame(width: 180, height: 180)
                         .clipShape(RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
                 }
@@ -339,9 +345,9 @@ struct MessageBubble: View {
                                 .lineSpacing(0)
                                 .multilineTextAlignment(.trailing)
                         } else {
-                            MarkdownText(text: message.text, 
-                                         fontSize: ds.messageTextSize, 
-                                         isError: message.role == .error)
+                            EnhancedMarkdownText(text: message.text, 
+                                               fontSize: ds.messageTextSize, 
+                                               isError: message.role == .error)
                                 .lineSpacing(2)
                                 .multilineTextAlignment(.leading)
                         }
@@ -350,25 +356,18 @@ struct MessageBubble: View {
                     .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                            .fill(message.role == .ai ? Color(white: 0.15) : Color.clear)  // Тёмный фон для AI
-                            .overlay(
-                                message.role == .ai
-                                    ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                                        .fill(providerColor.opacity(0.08))
-                                    : nil
-                            )
+                            .fill(message.role == .ai ? Color(white: 0.15) : Color.clear)
+                            .overlay(message.role == .ai ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius).fill(providerColor.opacity(0.08)) : nil)
                     )
                     .background(
-                        message.role != .ai
-                            ? AnyShapeStyle(.ultraThinMaterial)
-                            : AnyShapeStyle(Color.clear),
+                        message.role != .ai ? AnyShapeStyle(.ultraThinMaterial) : AnyShapeStyle(Color.clear),
                         in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
                     )
-                    .frame(maxWidth: message.role == .ai ? 320 : .infinity, alignment: message.role == .user ? .trailing : .leading)
+                    .frame(maxWidth: message.role == .ai ? 340 : .infinity, 
+                           alignment: message.role == .user ? .trailing : .leading)
                 }
             }
             
-            // Правый отступ
             if message.role == .user {
                 Spacer(minLength: 12)
             } else {
@@ -379,7 +378,124 @@ struct MessageBubble: View {
     }
 }
 
-// MARK: - Image Picker
+// MARK: - Улучшенный рендер с поддержкой математики (треугольники, углы, дроби и т.д.)
+struct EnhancedMarkdownText: View {
+    let text: String
+    let fontSize: CGFloat
+    let isError: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(parseBlocks(text).enumerated()), id: \.offset) { _, block in
+                blockView(block)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func blockView(_ block: MDBlock) -> some View {
+        switch block {
+        case .h1(let t): headerText(t, size: fontSize + 8, weight: .bold)
+        case .h2(let t): headerText(t, size: fontSize + 5, weight: .bold)
+        case .h3(let t): headerText(t, size: fontSize + 2, weight: .semibold)
+        case .bullet(let t):
+            HStack(alignment: .top, spacing: 8) {
+                Text("•").font(.system(size: fontSize)).foregroundStyle(.white.opacity(0.7))
+                mathAwareText(t)
+            }
+        case .code(let t):
+            Text(t)
+                .font(.system(size: fontSize - 1, design: .monospaced))
+                .foregroundStyle(.green.opacity(0.9))
+                .padding(10)
+                .background(Color.white.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        case .paragraph(let t):
+            mathAwareText(t)
+        case .divider:
+            Divider().background(Color.white.opacity(0.2))
+        }
+    }
+
+    private func headerText(_ content: String, size: CGFloat, weight: Font.Weight) -> some View {
+        Text(content)
+            .font(.system(size: size, weight: weight))
+            .foregroundStyle(isError ? .red : .white)
+    }
+
+    @ViewBuilder
+    private func mathAwareText(_ raw: String) -> some View {
+        let trimmed = raw.trimmingCharacters(in: .whitespaces)
+        
+        if isMathExpression(trimmed) {
+            Text(trimmed)
+                .font(.system(size: fontSize + 1, design: .monospaced))
+                .foregroundStyle(.cyan)
+                .padding(8)
+                .background(Color.white.opacity(0.07))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+        } else if let attr = try? AttributedString(markdown: raw) {
+            Text(attr)
+                .font(.system(size: fontSize))
+                .foregroundStyle(isError ? .red : .white)
+                .tint(.cyan)
+        } else {
+            Text(raw)
+                .font(.system(size: fontSize))
+                .foregroundStyle(isError ? .red : .white)
+        }
+    }
+
+    private func isMathExpression(_ text: String) -> Bool {
+        let indicators = ["\\(", "\\)", "\\[", "\\]", "$$", "\\frac", "\\sqrt", "\\int", "\\sum", "\\prod", "\\Delta", "\\angle", "△", "∠", "°", "^", "_", "≠", "≈"]
+        return indicators.contains { text.contains($0) } ||
+               (text.contains("=") && (text.contains("^") || text.contains("\\") || text.contains("△") || text.contains("∠")))
+    }
+
+    private func parseBlocks(_ input: String) -> [MDBlock] {
+        let lines = input.components(separatedBy: "\n")
+        var blocks: [MDBlock] = []
+        var codeBuffer: [String] = []
+        var inCode = false
+
+        for line in lines {
+            if line.hasPrefix("```") {
+                if inCode {
+                    blocks.append(.code(codeBuffer.joined(separator: "\n")))
+                    codeBuffer = []
+                    inCode = false
+                } else {
+                    inCode = true
+                }
+                continue
+            }
+            if inCode {
+                codeBuffer.append(line)
+                continue
+            }
+
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("### ") { blocks.append(.h3(String(line.dropFirst(4)))) }
+            else if trimmed.hasPrefix("## ") { blocks.append(.h2(String(line.dropFirst(3)))) }
+            else if trimmed.hasPrefix("# ") { blocks.append(.h1(String(line.dropFirst(2)))) }
+            else if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") { blocks.append(.bullet(String(line.dropFirst(2)))) }
+            else if trimmed == "---" || trimmed == "***" { blocks.append(.divider) }
+            else if !trimmed.isEmpty { blocks.append(.paragraph(line)) }
+        }
+        return blocks
+    }
+}
+
+enum MDBlock {
+    case h1(String), h2(String), h3(String)
+    case bullet(String)
+    case code(String)
+    case paragraph(String)
+    case divider
+}
+
+// MARK: - AppImagePicker и остальные структуры (оставлены без изменений)
 struct AppImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
     @Environment(\.dismiss) var dismiss
@@ -405,117 +521,4 @@ struct AppImagePicker: UIViewControllerRepresentable {
         }
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { parent.dismiss() }
     }
-}
-
-// MARK: - Markdown Text
-struct MarkdownText: View {
-    let text: String
-    let fontSize: CGFloat
-    let isError: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ForEach(Array(parseBlocks(text).enumerated()), id: \.offset) { _, block in
-                blockView(block)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    @ViewBuilder
-    private func blockView(_ block: MDBlock) -> some View {
-        switch block {
-        case .h1(let t):
-            Text(t)
-                .font(.system(size: fontSize + 8, weight: .bold))
-                .foregroundStyle(isError ? .red : .white)
-        case .h2(let t):
-            Text(t)
-                .font(.system(size: fontSize + 5, weight: .bold))
-                .foregroundStyle(isError ? .red : .white)
-        case .h3(let t):
-            HStack(spacing: 6) {
-                Circle().fill(Color.white.opacity(0.7)).frame(width: 5, height: 5)
-                Text(t)
-                    .font(.system(size: fontSize + 2, weight: .semibold))
-                    .foregroundStyle(isError ? .red : .white)
-            }
-        case .bullet(let t):
-            HStack(alignment: .top, spacing: 8) {
-                Text("•").font(.system(size: fontSize)).foregroundStyle(.white.opacity(0.7))
-                inlineText(t)
-            }
-        case .code(let t):
-            Text(t)
-                .font(.system(size: fontSize - 1, design: .monospaced))
-                .foregroundStyle(.green.opacity(0.9))
-                .padding(8)
-                .background(Color.white.opacity(0.06))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-        case .paragraph(let t):
-            inlineText(t)
-        case .divider:
-            Divider().background(Color.white.opacity(0.2))
-        }
-    }
-
-    @ViewBuilder
-    private func inlineText(_ raw: String) -> some View {
-        if let attr = try? AttributedString(markdown: raw, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
-            Text(attr)
-                .font(.system(size: fontSize, weight: .regular))
-                .foregroundStyle(isError ? .red : .white)
-                .tint(.cyan)
-        } else {
-            Text(raw)
-                .font(.system(size: fontSize, weight: .regular))
-                .foregroundStyle(isError ? .red : .white)
-        }
-    }
-
-    private func parseBlocks(_ input: String) -> [MDBlock] {
-        let lines = input.components(separatedBy: "\n")
-        var blocks: [MDBlock] = []
-        var codeBuffer: [String] = []
-        var inCode = false
-
-        for line in lines {
-            if line.hasPrefix("```") {
-                if inCode {
-                    blocks.append(.code(codeBuffer.joined(separator: "\n")))
-                    codeBuffer = []
-                    inCode = false
-                } else {
-                    inCode = true
-                }
-                continue
-            }
-            if inCode { codeBuffer.append(line); continue }
-
-            if line.hasPrefix("### ") {
-                blocks.append(.h3(String(line.dropFirst(4))))
-            } else if line.hasPrefix("## ") {
-                blocks.append(.h2(String(line.dropFirst(3))))
-            } else if line.hasPrefix("# ") {
-                blocks.append(.h1(String(line.dropFirst(2))))
-            } else if line.hasPrefix("- ") || line.hasPrefix("* ") {
-                blocks.append(.bullet(String(line.dropFirst(2))))
-            } else if line.trimmingCharacters(in: .whitespaces) == "---" || line.trimmingCharacters(in: .whitespaces) == "***" {
-                blocks.append(.divider)
-            } else if line.trimmingCharacters(in: .whitespaces).isEmpty {
-                // skip empty lines
-            } else {
-                blocks.append(.paragraph(line))
-            }
-        }
-        return blocks
-    }
-}
-
-enum MDBlock {
-    case h1(String), h2(String), h3(String)
-    case bullet(String)
-    case code(String)
-    case paragraph(String)
-    case divider
 }
