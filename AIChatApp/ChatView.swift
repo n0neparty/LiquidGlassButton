@@ -72,19 +72,21 @@ struct ChatView: View {
         HStack(spacing: 10) {
             Button { } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
+            .clipShape(Circle())
+            .frame(width: 40, height: 40)
             
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
+            .clipShape(Circle())
+            .frame(width: 40, height: 40)
             
             ZStack {
                 Capsule()
@@ -107,25 +109,26 @@ struct ChatView: View {
                 Button { } label: {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 40, height: 40)
                         .background(Circle().fill(.white))
                 }
                 .disabled(true)
             } else if inputText.isEmpty {
                 Button { } label: {
                     Image(systemName: "arrow.up")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.white)
-                        .frame(width: 44, height: 44)
                 }
                 .buttonStyle(.glass)
+                .clipShape(Circle())
+                .frame(width: 40, height: 40)
                 .disabled(true)
             } else {
                 Button { sendMessage() } label: {
                     Image(systemName: "arrow.up")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.black)
-                        .frame(width: 44, height: 44)
+                        .frame(width: 40, height: 40)
                         .background(Circle().fill(.white))
                 }
             }
@@ -182,11 +185,12 @@ struct MessageBubble: View {
                 Text(message.text)
                     .font(.system(size: 15, weight: .regular))
                     .foregroundStyle(message.role == .error ? .red : .white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.glass)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .disabled(true)
             
             if message.role != .user {

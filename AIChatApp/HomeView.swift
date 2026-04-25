@@ -74,20 +74,22 @@ struct HomeView: View {
             // Settings button
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape.fill")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
+            .clipShape(Circle())
+            .frame(width: 40, height: 40)
 
             // History button
             Button { } label: {
                 Image(systemName: "bubble.left.fill")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
+            .clipShape(Circle())
+            .frame(width: 40, height: 40)
 
             Spacer()
 
@@ -95,25 +97,26 @@ struct HomeView: View {
             Button { showSettings = true } label: {
                 HStack(spacing: 6) {
                     Image(systemName: selectedProvider.icon)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(selectedProvider.color)
                     Text(selectedModel.name)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
                     if let badge = selectedModel.badge {
                         Text(badge)
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(selectedProvider.color)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 3)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
                             .background(selectedProvider.color.opacity(0.2))
                             .clipShape(Capsule())
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
             }
             .buttonStyle(.glass)
+            .clipShape(Capsule())
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
             Spacer()
@@ -121,11 +124,12 @@ struct HomeView: View {
             // New chat button
             Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
+            .clipShape(Circle())
+            .frame(width: 40, height: 40)
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -192,18 +196,19 @@ struct HomeView: View {
                         inputText = "\(s.0) \(s.1)"
                         navigateToChat = true
                     } label: {
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(s.0)
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.system(size: 15, weight: .semibold))
                                 .foregroundStyle(.white)
                             Text(s.1)
-                                .font(.system(size: 14, weight: .regular))
+                                .font(.system(size: 13, weight: .regular))
                                 .foregroundStyle(.white.opacity(0.6))
                         }
-                        .frame(width: 160, alignment: .leading)
-                        .padding(16)
+                        .frame(width: 140, alignment: .leading)
+                        .padding(12)
                     }
                     .buttonStyle(.glass)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
             }
             .padding(.horizontal, 16)
@@ -217,20 +222,22 @@ struct HomeView: View {
             // Plus button
             Button { } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
+            .clipShape(Circle())
+            .frame(width: 40, height: 40)
             
             // Lightbulb button
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
             }
             .buttonStyle(.glass)
+            .clipShape(Circle())
+            .frame(width: 40, height: 40)
 
             // Text input
             ZStack {
@@ -250,24 +257,27 @@ struct HomeView: View {
             .frame(height: 44)
 
             // Send button - полностью белая
-            Button {
-                guard !inputText.isEmpty else { return }
-                navigateToChat = true
-            } label: {
-                Image(systemName: "arrow.up")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(inputText.isEmpty ? .white.opacity(0.4) : .black)
-                    .frame(width: 44, height: 44)
-                    .background {
-                        if inputText.isEmpty {
-                            Circle().fill(.ultraThinMaterial)
-                        } else {
-                            Circle().fill(.white)
-                        }
-                    }
+            if inputText.isEmpty {
+                Button { } label: {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+                .buttonStyle(.glass)
+                .clipShape(Circle())
+                .frame(width: 40, height: 40)
+                .disabled(true)
+            } else {
+                Button {
+                    navigateToChat = true
+                } label: {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.black)
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(.white))
+                }
             }
-            .disabled(inputText.isEmpty)
-            .animation(.spring(response: 0.35, dampingFraction: 0.7), value: inputText.isEmpty)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
