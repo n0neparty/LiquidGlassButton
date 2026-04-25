@@ -31,14 +31,14 @@ struct ChatView: View {
             .blur(radius: 90).ignoresSafeArea()
             VStack(spacing: 0) {
                 messageList
-                if isLoadin) }
+                if isLoading { WaveLoadingAnimation(color: provider.color) }
                 inputBar
             }
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-         s() } label: {
+                Button { dismiss() } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left").font(.system(size: 14, weight: .semibold))
                         Text("Back").font(.system(size: 16, weight: .regular))
@@ -48,7 +48,7 @@ struct ChatView: View {
             }
         }
         .navigationTitle(model.name)
-        .navigationBaayMode(.inline)
+        .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
         .task {
             thinkingMode = initialThinkingMode
@@ -65,7 +65,7 @@ struct ChatView: View {
                         MessageBubble(message: msg, providerColor: provider.color).id(msg.id)
                     }
                     if isStreaming && !streamingText.isEmpty {
- providerColor: provider.color)
+                        MessageBubble(message: ChatMessage(role: .ai, text: streamingText), providerColor: provider.color)
                             .id("streaming")
                     }
                 }
@@ -89,14 +89,14 @@ struct ChatView: View {
                     HStack(spacing: 8) {
                         ForEach(Array(selectedImages.enumerated()), id: \.offset) { index, image in
                             ZStack(alignment: .topTrailing) {
-                     uiImage: image).resizable().scaledToFill()
-                              .frame(width: 64, height: 64)
+                                Image(uiImage: image).resizable().scaledToFill()
+                                    .frame(width: 64, height: 64)
                                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                 Button { selectedImages.remove(at: index) } label: {
                                     Image(systemName: "xmark.circle.fill").font(.system(size: 20))
                                         .foregroundStyle(.white).background(Circle().fill(.black.opacity(0.6)))
                                 }
-     et(x: 8, y: -8)
+                                .offset(x: 8, y: -8)
                             }
                         }
                     }
@@ -121,14 +121,14 @@ struct ChatView: View {
                 }
                 Spacer().frame(width: 10)
                 TextField("Ask anything", text: $inputText)
-                 oregroundStyle(.white).tint(provider.color)
+                    .foregroundStyle(.white).tint(provider.color)
                     .focused($inputFocused).submitLabel(.send).onSubmit { sendMessage() }
                     .padding(.horizontal, 18).padding(.vertical, 13).frame(height: 44)
                     .background(Capsule().fill(.ultraThinMaterial)).layoutPriority(-1)
                 Spacer().frame(width: ds.inputBarSpacing)
                 if inputText.isEmpty {
                     Button { } label: {
-                        Image(systemName: "arrow.s.buttonIconSize, weight: .bold))
+                        Image(systemName: "arrow.up").font(.system(size: ds.buttonIconSize, weight: .bold))
                             .foregroundStyle(.white).frame(width: ds.buttonSize, height: ds.buttonSize)
                     }
                     .buttonStyle(.glass).buttonBorderShape(.circle).disabled(true)
@@ -162,7 +162,7 @@ struct ChatView: View {
                     let tr = try await APIService.shared.sendMessage(model: model, message: "Think carefully. Reply only '1337' to confirm.", chatId: chatId, image: nil)
                     if let id = tr.resolvedChatId { chatId = id }
                 }
-                let response = try await APIService.shared.sendMessage(model: mode
+                let response = try await APIService.shared.sendMessage(model: model, message: userMsg, chatId: chatId, image: img)
                 if let id = response.resolvedChatId { chatId = id }
                 if let err = response.error {
                     messages.append(ChatMessage(role: .error, text: err))
@@ -231,7 +231,7 @@ struct MessageBubble: View {
                             RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
                                 .fill(message.role == .ai ? Color(white: 0.05) : Color.clear)
                         )
-                   .background(
+                        .background(
                             message.role != .ai ? AnyShapeStyle(.ultraThinMaterial) : AnyShapeStyle(Color.clear),
                             in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
                         )
@@ -245,14 +245,14 @@ struct MessageBubble: View {
 // MARK: - Image Picker
 struct AppImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
-    @ent(\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let p = UIImagePickerController(); p.delegate = context.coordinator; p.sourceType = .photoLibrary; return p
     }
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
     func makeCoordinator() -> Coordinator { Coordinator(self) }
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: AppImage
+        let parent: AppImagePicker
         init(_ parent: AppImagePicker) { self.parent = parent }
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage { parent.images.append(image) }
@@ -282,7 +282,7 @@ struct MarkdownText: View {
     @ViewBuilder
     private func blockView(_ block: MDBlock) -> some View {
         switch block {
-  case .h1(let t): Text(t).font(.system(size: fontSize + 8, weight: .bold)).foregroundStyle(isError ? .red : .white)
+        case .h1(let t): Text(t).font(.system(size: fontSize + 8, weight: .bold)).foregroundStyle(isError ? .red : .white)
         case .h2(let t): Text(t).font(.system(size: fontSize + 5, weight: .bold)).foregroundStyle(isError ? .red : .white)
         case .h3(let t):
             HStack(spacing: 6) {
@@ -311,7 +311,7 @@ struct MarkdownText: View {
         }
     }
 
-    peBlocks(_ input: String) -> [MDBlock] {
+    private func parseBlocks(_ input: String) -> [MDBlock] {
         var blocks: [MDBlock] = []
         var codeBuf: [String] = []
         var inCode = false
@@ -337,7 +337,7 @@ struct MarkdownText: View {
         s = s.replacingOccurrences(of: "\\[", with: "").replacingOccurrences(of: "\\]", with: "")
         s = s.replacingOccurrences(of: "$$", with: "")
         if let re = try? NSRegularExpression(pattern: #"\$([^$\n]+)\$"#) {
-         
+            s = re.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: "$1")
         }
         s = s.replacingOccurrences(of: "$", with: "")
         s = replaceFrac(s)
@@ -348,34 +348,35 @@ struct MarkdownText: View {
         s = replacePowers(s)
         s = replaceSubs(s)
         let table: [(String, String)] = [
-            ("\\alpha","α"\\epsilon","ε"),
-            ("\\varepsilon","ε"),("\\zeta","ζ"),("\\eta","η"),("\\theta","θ"),("\\iota","ι"),
-            ("\\kappa","κ"),("\\lambda","λ"),("\\mu","μ"),("\\nu","ν"),("\\xi","ξ"),
-            ("\\pi","π"),("\\rho","ρ"),("\\sigma","σ"),("\\tau","τ"),("\\upsilon","υ"),
-            ("\\phi","φ"),("\\varphi","φ"),("\\chi","χ"),("\\psi","ψ"),("\\omega","ω"),
-            ("\\Gamma","Γ"),("\\Delta","Δ"),("\\Theta","Θ"),("\\Lambda","Λ"),("\\Xi","Ξ"),
-            ("\\Pi","Π"),("\\Sigma","Σ"),("\\Phi","Φ"),("\\Psi","Ψ"),("\\Omega","Ω"),
-            ("\\triangle","△"),("\\angle","∠"),("\\perp","⊥"),("\\parallel","∥"),
-            ("\\sim","∼"),("\\cong","≅"),("\\approx","≈"),("\\neq","≠"),("\\ne","≠"),
-            ("\\equiv","≡"),("\\leq","≤"),("\\le","≤"),("\\geq","≥"),("\\ge","≥"),
-            ("\\ll","≪"),("\\gg","≫"),("\\infty","∞"),("\\pm","±"),("\\mp","∓"),
-            ("\\times","×"),("\\div","÷"),("\\cdot","·"),("\\circ","∘"),("\\bullet","•"),
-            ("\\in","∈")"\\subseteq","⊆"),
-            ("\\supset","⊃"),("\\cup","∪"),("\\cap","∩"),("\\emptyset","∅"),
-            ("\\forall","∀"),("\\exists","∃"),("\\neg","¬"),("\\land","∧"),("\\lor","∨"),
-            ("\\rightarrow","→"),("\\to","→"),("\\leftarrow","←"),
-            ("\\Rightarrow","⇒"),("\\Leftarrow","⇐"),("\\leftrightarrow","↔"),("\\Leftrightarrow","⇔"),
-            ("\\uparrow","↑"),("\\downarrow","↓"),("\\mapsto","↦"),
-            ("\\sum","∑"),("\\prod","∏"),("\\int","∫"),("\\oint","∮"),
-            ("\\partial","∂"),("\\nabla","∇"),
-            ("\\ldots","…"),("\\cdots","⋯"),("\\vdots","⋮"),("\\ddots","⋱"),
-            ("\\lfloor","⌊"),("\\rfloor","⌋"),("\\lceil","⌈"),("\\rceil","⌉"),
-            ("\\langle","⟨"),("\\rangle","⟩"),
-            ("\\{","{"),("\\}","}"),("\\|","‖"),("^\\circ","°"),("\\degree","°"),
-            ("\\therefore","∴"),("\\because","∵"),("\\propto","∝"),
-            ("\\hbar","ℏ"),("\\ell","ℓ"),("\\Re","ℜ"),("\\Im","ℑ"),
+            ("\\alpha","α"), ("\\epsilon","ε"), ("\\varepsilon","ε"), ("\\zeta","ζ"), ("\\eta","η"), ("\\theta","θ"), ("\\iota","ι"),
+            ("\\kappa","κ"), ("\\lambda","λ"), ("\\mu","μ"), ("\\nu","ν"), ("\\xi","ξ"),
+            ("\\pi","π"), ("\\rho","ρ"), ("\\sigma","σ"), ("\\tau","τ"), ("\\upsilon","υ"),
+            ("\\phi","φ"), ("\\varphi","φ"), ("\\chi","χ"), ("\\psi","ψ"), ("\\omega","ω"),
+            ("\\Gamma","Γ"), ("\\Delta","Δ"), ("\\Theta","Θ"), ("\\Lambda","Λ"), ("\\Xi","Ξ"),
+            ("\\Pi","Π"), ("\\Sigma","Σ"), ("\\Phi","Φ"), ("\\Psi","Ψ"), ("\\Omega","Ω"),
+            ("\\triangle","△"), ("\\angle","∠"), ("\\perp","⊥"), ("\\parallel","∥"),
+            ("\\sim","∼"), ("\\cong","≅"), ("\\approx","≈"), ("\\neq","≠"), ("\\ne","≠"),
+            ("\\equiv","≡"), ("\\leq","≤"), ("\\le","≤"), ("\\geq","≥"), ("\\ge","≥"),
+            ("\\ll","≪"), ("\\gg","≫"), ("\\infty","∞"), ("\\pm","±"), ("\\mp","∓"),
+            ("\\times","×"), ("\\div","÷"), ("\\cdot","·"), ("\\circ","∘"), ("\\bullet","•"),
+            ("\\in","∈"), ("\\subseteq","⊆"),
+            ("\\supset","⊃"), ("\\cup","∪"), ("\\cap","∩"), ("\\emptyset","∅"),
+            ("\\forall","∀"), ("\\exists","∃"), ("\\neg","¬"), ("\\land","∧"), ("\\lor","∨"),
+            ("\\rightarrow","→"), ("\\to","→"), ("\\leftarrow","←"),
+            ("\\Rightarrow","⇒"), ("\\Leftarrow","⇐"), ("\\leftrightarrow","↔"), ("\\Leftrightarrow","⇔"),
+            ("\\uparrow","↑"), ("\\downarrow","↓"), ("\\mapsto","↦"),
+            ("\\sum","∑"), ("\\prod","∏"), ("\\int","∫"), ("\\oint","∮"),
+            ("\\partial","∂"), ("\\nabla","∇"),
+            ("\\ldots","…"), ("\\cdots","⋯"), ("\\vdots","⋮"), ("\\ddots","⋱"),
+            ("\\lfloor","⌊"), ("\\rfloor","⌋"), ("\\lceil","⌈"), ("\\rceil","⌉"),
+            ("\\langle","⟨"), ("\\rangle","⟩"),
+            ("\\{","{"), ("\\}","}"), ("\\|","‖"), ("^\\circ","°"), ("\\degree","°"),
+            ("\\therefore","∴"), ("\\because","∵"), ("\\propto","∝"),
+            ("\\hbar","ℏ"), ("\\ell","ℓ"), ("\\Re","ℜ"), ("\\Im","ℑ"),
         ]
-        for (l, u) in table , with: u) }
+        for (l, u) in table {
+            s = s.replacingOccurrences(of: l, with: u)
+        }
         if let re = try? NSRegularExpression(pattern: #"\\overline\{([^}]+)\}"#) {
             s = re.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: "$1\u{0305}")
         }
