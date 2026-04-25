@@ -12,11 +12,7 @@ struct HomeView: View {
     @State private var showImagePicker = false
     @State private var thinkingMode = false
     @FocusState private var inputFocused: Bool
-    @ObservedObject var debugSettings: DebugSettings
-    
-    init() {
-        _debugSettings = ObservedObject(wrappedValue: DebugSettings.shared)
-    }
+    @ObservedObject var debugSettings = DebugSettings.shared
 
     let suggestions = [
         ("Tell me", "something fascinating"),

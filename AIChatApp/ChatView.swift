@@ -17,9 +17,8 @@ struct ChatView: View {
     @FocusState private var inputFocused: Bool
     @Environment(\.dismiss) var dismiss
 
-    // Use nonisolated(unsafe) to access @MainActor singleton in Swift 6
-    nonisolated(unsafe) static let settings = DebugSettings.shared
-    var ds: DebugSettings { ChatView.settings }
+    // Access shared settings
+    var ds: DebugSettings { DebugSettings.shared }
 
     var body: some View {
         ZStack {
@@ -261,8 +260,7 @@ struct MessageBubble: View {
     let message: ChatMessage
     let providerColor: Color
 
-    nonisolated(unsafe) static let settings = DebugSettings.shared
-    var ds: DebugSettings { MessageBubble.settings }
+    var ds: DebugSettings { DebugSettings.shared }
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {

@@ -42,5 +42,5 @@ class DebugSettings: ObservableObject {
     @Published var suggestionChipWidth: CGFloat = 150
     @Published var suggestionChipSpacing: CGFloat = 5
     
-    @MainActor static let shared = DebugSettings()
+    static let shared = DebugSettings()
 }
