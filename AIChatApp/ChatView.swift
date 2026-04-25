@@ -300,7 +300,7 @@ struct MessageBubble: View {
                         .padding(.vertical, ds.messageBubbleVerticalPadding)
                         .background(
                             RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                                .fill(message.role == .ai ? Color(white: 0.12) : Color.clear)
+                                .fill(message.role == .ai ? Color(white: 0.05) : Color.clear)
                         )
                         .background(
                             message.role != .ai
@@ -351,7 +351,7 @@ struct MarkdownText: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            ForEach(Array(parseBlocks(text).enumerated()), id: \.offset) { _, block in
+            ForEach(Array(parseBlocks(LaTeXConverter.convert(text)).enumerated()), id: \.offset) { _, block in
                 blockView(block)
             }
         }
@@ -454,4 +454,149 @@ enum MDBlock {
     case code(String)
     case paragraph(String)
     case divider
+}
+
+// MARK: - LaTeX Converter
+struct LaTeXConverter {
+    static func convert(_ input: String) -> String {
+        var s = input
+
+        // Strip display math \[ \] and $$
+        s = s.replacingOccurrences(of: "\\[", with: "").replacingOccurrences(of: "\\]", with: "")
+        s = s.replacingOccurrences(of: "$$", with: "")
+
+        // Inline math $...$ strip delimiters, then remove lone $
+        s = s.replacingOccurrences(of: #"\$([^$\n]+)\$"#, with: "$1", options: .regularExpression)
+        s = s.replacingOccurrences(of: "$", with: "")
+
+        // \frac{a}{b}
+        s = replaceFrac(s)
+
+        // \sqrt{x} -> sqrt(x)
+        s = replaceCmd(s, cmd: "sqrt", open: "sqrt(", close: ")")
+
+        // \text{x} -> x
+        s = replaceCmd(s, cmd: "text", open: "", close: "")
+
+        // Superscripts and subscripts
+        s = replaceSuperscript(s)
+        s = replaceSubscript(s)
+
+        // Greek letters
+        let greek: [(String, String)] = [
+            ("\\alpha","?"),("\\beta","?"),("\\gamma","?"),("\\delta","?"),
+            ("\\epsilon","?"),("\\zeta","?"),("\\eta","?"),("\\theta","?"),
+            ("\\iota","?"),("\\kappa","?"),("\\lambda","?"),("\\mu","?"),
+            ("\\nu","?"),("\\xi","?"),("\\pi","?"),("\\rho","?"),
+            ("\\sigma","?"),("\\tau","?"),("\\upsilon","?"),("\\phi","?"),
+            ("\\chi","?"),("\\psi","?"),("\\omega","?"),
+            ("\\Gamma","?"),("\\Delta","?"),("\\Theta","?"),("\\Lambda","?"),
+            ("\\Xi","?"),("\\Pi","?"),("\\Sigma","?"),("\\Phi","?"),
+            ("\\Psi","?"),("\\Omega","?"),
+        ]
+        for (l, u) in greek { s = s.replacingOccurrences(of: l, with: u) }
+
+        // Math & geometry symbols
+        let symbols: [(String, String)] = [
+            ("\\triangle","?"),("\\angle","?"),("\\perp","?"),("\\parallel","?"),
+            ("\\sim","?"),("\\cong","?"),("\\approx","?"),("\\neq","?"),
+            ("\\leq","?"),("\\geq","?"),("\\ll","?"),("\\gg","?"),
+            ("\\infty","?"),("\\pm","�"),("\\mp","?"),("\\times","?"),
+            ("\\div","?"),("\\cdot","�"),("\\circ","?"),("\\degree","�"),
+            ("\\in","?"),("\\notin","?"),("\\subset","?"),("\\supset","?"),
+            ("\\cup","?"),("\\cap","?"),("\\emptyset","?"),
+            ("\\forall","?"),("\\exists","?"),("\\neg","�"),
+            ("\\rightarrow",">"),("\\leftarrow","<"),("\\Rightarrow","?"),
+            ("\\Leftarrow","?"),("\\leftrightarrow","-"),("\\Leftrightarrow","?"),
+            ("\\sum","?"),("\\prod","?"),("\\int","?"),
+            ("\\partial","?"),("\\nabla","?"),
+            ("\\ldots","�"),("\\cdots","?"),("\\vdots","?"),("\\ddots","?"),
+            ("\\lfloor","?"),("\\rfloor","?"),("\\lceil","?"),("\\rceil","?"),
+            ("\\{","{"),("\\}","}"),("\\|","?"),("^\\circ","�"),
+        ]
+        for (l, u) in symbols { s = s.replacingOccurrences(of: l, with: u) }
+
+        // \overline{AB} -> AB?
+        s = s.replacingOccurrences(of: #"\\overline\{([^}]+)\}"#, with: "$1?", options: .regularExpression)
+        // \vec{x} -> x?
+        s = s.replacingOccurrences(of: #"\\vec\{([^}]+)\}"#, with: "$1?", options: .regularExpression)
+        // Remove remaining \cmd
+        s = s.replacingOccurrences(of: #"\\\w+"#, with: "", options: .regularExpression)
+        // Clean braces
+        s = s.replacingOccurrences(of: "{", with: "").replacingOccurrences(of: "}", with: "")
+
+        return s
+    }
+
+    private static func replaceFrac(_ s: String) -> String {
+        var result = s
+        let pattern = #"\\frac\{([^}]*)\}\{([^}]*)\}"#
+        while let range = result.range(of: pattern, options: .regularExpression) {
+            let match = String(result[range])
+            if let r = match.range(of: #"\{([^}]*)\}\{([^}]*)\}"#, options: .regularExpression) {
+                let inner = String(match[r])
+                let parts = inner.dropFirst().dropLast()
+                let split = parts.components(separatedBy: "}{")
+                if split.count == 2 {
+                    result = result.replacingCharacters(in: range, with: "(\(split[0])/\(split[1]))")
+                    continue
+                }
+            }
+            break
+        }
+        return result
+    }
+
+    private static func replaceCmd(_ s: String, cmd: String, open o: String, close c: String) -> String {
+        var result = s
+        let pattern = "\\\\\(cmd)\\{([^}]*)\\}"
+        result = result.replacingOccurrences(of: pattern, with: "\(o)$1\(c)", options: .regularExpression)
+        return result
+    }
+
+    private static func replaceSuperscript(_ s: String) -> String {
+        let map: [Character: String] = [
+            "0":"?","1":"?","2":"?","3":"?","4":"?","5":"?","6":"?","7":"?","8":"?","9":"?",
+            "n":"?","i":"?","a":"?","b":"?","c":"?","d":"?","e":"?","f":"?","g":"?",
+            "h":"?","j":"?","k":"?","l":"?","m":"?","o":"?","p":"?","r":"?","s":"?",
+            "t":"?","u":"?","v":"?","w":"?","x":"?","y":"?","z":"?","+":"?","-":"?"
+        ]
+        var result = s
+        result = result.replacingOccurrences(of: #"\^\{([^}]+)\}"#, with: { m in
+            m.dropFirst(2).dropLast().map { map[$0] ?? String($0) }.joined()
+        }, options: .regularExpression)
+        result = result.replacingOccurrences(of: #"\^([0-9a-zA-Z])"#, with: { m in
+            map[m.last!] ?? String(m.last!)
+        }, options: .regularExpression)
+        return result
+    }
+
+    private static func replaceSubscript(_ s: String) -> String {
+        let map: [Character: String] = [
+            "0":"?","1":"?","2":"?","3":"?","4":"?","5":"?","6":"?","7":"?","8":"?","9":"?",
+            "a":"?","e":"?","o":"?","x":"?","n":"?","i":"?","j":"?","k":"?","l":"?",
+            "m":"?","p":"?","r":"?","s":"?","t":"?","u":"?","v":"?","+":"?","-":"?"
+        ]
+        var result = s
+        result = result.replacingOccurrences(of: #"_\{([^}]+)\}"#, with: { m in
+            m.dropFirst(2).dropLast().map { map[$0] ?? String($0) }.joined()
+        }, options: .regularExpression)
+        result = result.replacingOccurrences(of: #"_([0-9a-zA-Z])"#, with: { m in
+            map[m.last!] ?? String(m.last!)
+        }, options: .regularExpression)
+        return result
+    }
+}
+
+private extension String {
+    func replacingOccurrences(of pattern: String, with transform: (String) -> String, options: String.CompareOptions) -> String {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return self }
+        let results = regex.matches(in: self, range: NSRange(self.startIndex..., in: self))
+        var result = self
+        for match in results.reversed() {
+            guard let range = Range(match.range, in: self), let rRange = Range(match.range, in: result) else { continue }
+            result = result.replacingCharacters(in: rRange, with: transform(String(self[range])))
+        }
+        return result
+    }
 }
