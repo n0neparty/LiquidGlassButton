@@ -230,23 +230,26 @@ struct HomeView: View {
     // MARK: Input Bar (Sticky Bottom)
     var inputBar: some View {
         HStack(spacing: debugSettings.inputBarSpacing) {
-            // Plus button
-            Button { } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+            // Left buttons group
+            HStack(spacing: debugSettings.inputBarSpacing) {
+                // Plus button
+                Button { } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                
+                // Lightbulb button
+                Button { } label: {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
             }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            
-            // Lightbulb button
-            Button { } label: {
-                Image(systemName: "lightbulb.fill")
-                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-            }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
 
             // Text input
             TextField("Ask anything", text: $inputText)

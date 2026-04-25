@@ -94,21 +94,24 @@ struct ChatView: View {
     // MARK: Input Bar с системным liquid glass
     var inputBar: some View {
         HStack(spacing: debugSettings.inputBarSpacing) {
-            Button { } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+            // Left buttons group
+            HStack(spacing: debugSettings.inputBarSpacing) {
+                Button { } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                
+                Button { } label: {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
             }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            
-            Button { } label: {
-                Image(systemName: "lightbulb.fill")
-                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-            }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
             
             TextField("Ask anything", text: $inputText)
                 .font(.system(size: 16, weight: .regular))
