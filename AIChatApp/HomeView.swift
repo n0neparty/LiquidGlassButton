@@ -71,19 +71,18 @@ struct HomeView: View {
     // MARK: Top Bar (Header) с настоящим liquid glass
     var topBar: some View {
         HStack(spacing: 12) {
-            // Settings button
-            Button { showSettings = true } label: {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
-
-            // History button
-            Button { } label: {
-                Image(systemName: "bubble.left.fill")
+            // Settings + History combined button
+            Menu {
+                Button {
+                    showSettings = true
+                } label: {
+                    Label("Settings", systemImage: "gearshape.fill")
+                }
+                Button { } label: {
+                    Label("History", systemImage: "bubble.left.fill")
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
@@ -187,7 +186,7 @@ struct HomeView: View {
         .padding(.horizontal, 32)
     }
 
-    // MARK: Suggestion Chips (Action Cards) с настоящим liquid glass
+    // MARK: Suggestion Chips (Action Cards) - квадратные без liquid glass
     var suggestionChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -207,9 +206,9 @@ struct HomeView: View {
                         .frame(width: 150, alignment: .leading)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
-                    .buttonStyle(.glass)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 }
             }
             .padding(.horizontal, 16)
