@@ -38,9 +38,6 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "gpt5",         name: "GPT-5",          badge: "Pro",   apiProvider: "g4f",     apiModel: "gpt5"),
         AIModel(id: "gpt5-think",   name: "GPT-5 Thinking", badge: "Think", apiProvider: "g4f",     apiModel: "gpt5_thinking"),
         AIModel(id: "gpt5-mini",    name: "GPT-5 Mini",     badge: nil,     apiProvider: "merlin",  apiModel: "gpt-5-mini"),
-        AIModel(id: "gpt54",        name: "GPT-5.4",        badge: "Pro",   apiProvider: "merlin",  apiModel: "gpt-5.4"),
-        AIModel(id: "gpt52",        name: "GPT-5.2",        badge: nil,     apiProvider: "merlin",  apiModel: "gpt-5.2"),
-        AIModel(id: "gpt51",        name: "GPT-5.1",        badge: nil,     apiProvider: "merlin",  apiModel: "gpt-5.1"),
         AIModel(id: "o3",           name: "O3",             badge: "Think", apiProvider: "g4f",     apiModel: "o3"),
         AIModel(id: "o3pro",        name: "O3 Pro",         badge: "Think", apiProvider: "g4f",     apiModel: "o3pro"),
         AIModel(id: "o3-res",       name: "O3 Research",    badge: "Think", apiProvider: "g4f",     apiModel: "o3_research"),
@@ -49,9 +46,12 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "o3pro-labs",   name: "O3 Pro Labs",    badge: nil,     apiProvider: "g4f",     apiModel: "o3pro_labs"),
         AIModel(id: "o4mini",       name: "O4 Mini",        badge: "Fast",  apiProvider: "g4f",     apiModel: "o4mini"),
     ]),
+    
     AIProvider(id: "gemini", name: "Gemini", icon: "star.fill", colorHex: "#4285F4", models: [
-        AIModel(id: "gem31-pro-m",      name: "Gemini 3.1 Pro",           badge: "Pro",  apiProvider: "merlin", apiModel: "gemini-3.1-pro"),
-        AIModel(id: "gem30-pro",        name: "Gemini 3.0 Pro",           badge: nil,    apiProvider: "merlin", apiModel: "gemini-3.0-pro"),
+        AIModel(id: "gem-flash-lite-latest",      name: "Gemini Flash Lite Latest",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-flash-lite-latest"),
+        AIModel(id: "gem-flash-latest",      name: "Gemini Flash Latest",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-flash-latest"),
+        AIModel(id: "gem31-flash-lite-prev",      name: "Gemini 3.1 Flash Lite Preview",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-3.1-flash-lite-preview"),
+        AIModel(id: "gem3-flash-prev",      name: "Gemini 3 Flash Preview",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-3-flash-preview"),
         AIModel(id: "gem25-flash",      name: "Gemini 2.5 Flash",         badge: nil,    apiProvider: "gemini", apiModel: "gemini-2.5-flash"),
         AIModel(id: "gem25-lite",       name: "Gemini 2.5 Flash Lite",    badge: "Lite", apiProvider: "gemini", apiModel: "gemini-2.5-flash-lite"),
     ]),
@@ -77,7 +77,8 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "pixtral",     name: "Pixtral 12B",    badge: nil,    apiProvider: "mistral", apiModel: "pixtral-12b-2409"),
     ]),
     AIProvider(id: "deepseek", name: "DeepSeek", icon: "magnifyingglass.circle.fill", colorHex: "#7B68EE", models: [
-        AIModel(id: "ds-r1",       name: "DeepSeek R1",    badge: "Think", apiProvider: "merlin", apiModel: "deepseek-r1"),
+        AIModel(id: "ds-r1",       name: "DeepSeek R1",    badge: "Think", apiProvider: "github", apiModel: "Deepseek-R1"),
+        AIModel(id: "ds-v3",       name: "DeepSeek V3",    badge: nil, apiProvider: "github", apiModel: "Deepseek-V3"),
     ]),
     AIProvider(id: "llama", name: "Llama", icon: "hare.fill", colorHex: "#9B59B6", models: [
         AIModel(id: "llama-405b",  name: "Llama 3.1 405B", badge: "Pro",  apiProvider: "github", apiModel: "Meta-Llama-3.1-405B-Instruct"),
@@ -94,10 +95,7 @@ let ALL_PROVIDERS: [AIProvider] = [
     ]),
     AIProvider(id: "other", name: "Other", icon: "cpu.fill", colorHex: "#95A5A6", models: [
         AIModel(id: "kimi-k25",    name: "Kimi K2.5 Thinking",     badge: "Think", apiProvider: "merlin", apiModel: "kimi-k2.5-thinking"),
-        AIModel(id: "kimi-k2",     name: "Kimi K2",                badge: nil,     apiProvider: "merlin", apiModel: "kimi-k2"),
         AIModel(id: "minimax",     name: "MiniMax M2.5",           badge: nil,     apiProvider: "merlin", apiModel: "minimax-m2.5"),
-        AIModel(id: "glm",         name: "GLM",                    badge: nil,     apiProvider: "merlin", apiModel: "glm"),
-        AIModel(id: "nemotron",    name: "Nemotron 70B",           badge: nil,     apiProvider: "monica", apiModel: "nemotron-70b"),
     ]),
 ]
 
