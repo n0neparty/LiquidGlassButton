@@ -27,8 +27,7 @@ struct AIModel: Identifiable, Hashable, Sendable {
 let ALL_PROVIDERS: [AIProvider] = [
     AIProvider(id: "grok", name: "Grok", icon: "bolt.fill", colorHex: "#1D9BF0", models: [
         AIModel(id: "grok-fast",    name: "Grok 4.1 Fast",  badge: "Fast",  apiProvider: "merlin",  apiModel: "grok-4.1-fast"),
-        AIModel(id: "grok-4",       name: "Grok 4",         badge: nil,     apiProvider: "g4f",     apiModel: "grok"),
-        AIModel(id: "grok4-pplx",   name: "Grok 4",              badge: "Pro", apiProvider: "g4f", apiModel: "grok4"),
+        AIModel(id: "grok4-pplx",   name: "Grok 4",         badge: "Pro",   apiProvider: "g4f",     apiModel: "grok4"),
     ]),
     AIProvider(id: "chatgpt", name: "ChatGPT", icon: "sparkles", colorHex: "#10A37F", models: [
         AIModel(id: "gpt4o-mini",   name: "GPT-4o mini",    badge: "Fast",  apiProvider: "github",  apiModel: "gpt-4o-mini"),
@@ -51,8 +50,6 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "o4mini",       name: "O4 Mini",        badge: "Fast",  apiProvider: "g4f",     apiModel: "o4mini"),
     ]),
     AIProvider(id: "gemini", name: "Gemini", icon: "star.fill", colorHex: "#4285F4", models: [
-        AIModel(id: "gem-fast",         name: "Gemini Fast",              badge: "Fast", apiProvider: "g4f",    apiModel: "gemini-fast"),
-        AIModel(id: "gem-search",       name: "Gemini Search",            badge: "Web",  apiProvider: "g4f",    apiModel: "gemini-search"),
         AIModel(id: "gem31-pro-m",      name: "Gemini 3.1 Pro",           badge: "Pro",  apiProvider: "merlin", apiModel: "gemini-3.1-pro"),
         AIModel(id: "gem30-pro",        name: "Gemini 3.0 Pro",           badge: nil,    apiProvider: "merlin", apiModel: "gemini-3.0-pro"),
         AIModel(id: "gem25-flash",      name: "Gemini 2.5 Flash",         badge: nil,    apiProvider: "gemini", apiModel: "gemini-2.5-flash"),
