@@ -1,8 +1,8 @@
 import Foundation
 
 @MainActor
-final class APIService {
-    static let shared = APIService()
+final class APIService: Sendable {
+    nonisolated(unsafe) static let shared = APIService()
     private init() {}
 
     func sendMessage(model: AIModel, message: String, chatId: String?) async throws -> ChatResponse {
@@ -13,11 +13,9 @@ final class APIService {
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.timeoutInterval = 30
-
         var body: [String: Any] = ["message": message, "model": model.apiModel]
         if let chatId { body["chatId"] = chatId }
         req.httpBody = try JSONSerialization.data(withJSONObject: body)
-
         let (data, _) = try await URLSession.shared.data(for: req)
         return try JSONDecoder().decode(ChatResponse.self, from: data)
     }
