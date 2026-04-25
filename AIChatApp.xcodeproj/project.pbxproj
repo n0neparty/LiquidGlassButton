@@ -16,7 +16,7 @@
 		A1000007 /* ChatView.swift in Sources */     = {isa = PBXBuildFile; fileRef = A1000017; };
 		A1000008 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000018; };
 		A1000009 /* DebugSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000019; };
-		A1000010 /* Info.plist in Resources */       = {isa = PBXBuildFile; fileRef = A1000020; };
+		A100000A /* Info.plist in Resources */       = {isa = PBXBuildFile; fileRef = A100001A; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,7 +30,7 @@
 		A1000017 /* ChatView.swift */    = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift;    sourceTree = "<group>"; };
 		A1000018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A1000019 /* DebugSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugSettings.swift; sourceTree = "<group>"; };
-		A1000020 /* Info.plist */        = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A100001A /* Info.plist */        = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -42,7 +42,7 @@
 		A1000021 /* AIChatApp */ = {
 			isa = PBXGroup;
 			children = (
-				A1000020 /* Info.plist */,
+				A100001A /* Info.plist */,
 				A1000011 /* AIChatApp.swift */,
 				A1000012 /* ContentView.swift */,
 				A1000013 /* HomeView.swift */,
@@ -122,7 +122,7 @@
 		A1000032 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = (A1000006, A1000010);
+			files = (A1000006, A100000A);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
