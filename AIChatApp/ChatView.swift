@@ -54,6 +54,12 @@ struct ChatView: View {
                     }
                 }
                 
+                // Loading animation
+                if isLoading {
+                    ThinkingAnimation(color: provider.color)
+                        .padding(.bottom, 12)
+                }
+                
                 // Input bar
                 inputBar
             }
@@ -120,36 +126,30 @@ struct ChatView: View {
             }
             .frame(height: 44)
             
-            // Send button - одинаковый размер в обоих состояниях
-            if isLoading {
-                Button { } label: {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+            // Send button
+            ZStack {
+                if inputText.isEmpty {
+                    Button { } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    .disabled(true)
+                } else {
+                    Button { sendMessage() } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(.black)
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.plain)
+                    .background(Circle().fill(.white))
                 }
-                .buttonStyle(.plain)
-                .background(Circle().fill(.white).frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize))
-                .disabled(true)
-            } else if inputText.isEmpty {
-                Button { } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .disabled(true)
-            } else {
-                Button { sendMessage() } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.black)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                }
-                .buttonStyle(.plain)
-                .background(Circle().fill(.white).frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize))
             }
+            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
         }
         .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
         .padding(.vertical, debugSettings.inputBarVerticalPadding)
@@ -185,6 +185,42 @@ struct ChatView: View {
             }
             isLoading = false
         }
+    }
+}
+
+// MARK: - Thinking Animation
+struct ThinkingAnimation: View {
+    let color: Color
+    @State private var phase: CGFloat = 0
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<3) { index in
+                Circle()
+                    .fill(color)
+                    .frame(width: 8, height: 8)
+                    .scaleEffect(scale(for: index))
+                    .opacity(opacity(for: index))
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial, in: Capsule())
+        .onAppear {
+            withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                phase = 1
+            }
+        }
+    }
+    
+    private func scale(for index: Int) -> CGFloat {
+        let progress = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
+        return 1 + sin(progress * .pi) * 0.5
+    }
+    
+    private func opacity(for index: Int) -> Double {
+        let progress = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
+        return 0.4 + sin(progress * .pi) * 0.6
     }
 }
 
