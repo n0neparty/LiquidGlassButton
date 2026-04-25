@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 let API_BASE = "http://1.1.1.1:4000"
 
@@ -90,15 +91,17 @@ let ALL_PROVIDERS: [AIProvider] = [
 ]
 
 // MARK: - Chat
-struct ChatMessage: Identifiable, Sendable {
+struct ChatMessage: Identifiable {
     let id: UUID
     let role: MessageRole
     let text: String
+    let image: UIImage?
 
-    init(role: MessageRole, text: String) {
+    init(role: MessageRole, text: String, image: UIImage? = nil) {
         self.id = UUID()
         self.role = role
         self.text = text
+        self.image = image
     }
 }
 

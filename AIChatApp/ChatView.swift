@@ -186,7 +186,7 @@ struct ChatView: View {
         let useThinking = thinkingMode
         inputText = ""
         selectedImages = []
-        messages.append(ChatMessage(role: .user, text: userMsg))
+        messages.append(ChatMessage(role: .user, text: userMsg, image: imagesToSend.first))
         isLoading = true
 
         Task {
@@ -266,12 +266,28 @@ struct MessageBubble: View {
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             if message.role == .user { Spacer(minLength: 60) }
-            Text(message.text)
-                .font(.system(size: ds.messageTextSize, weight: .regular))
-                .foregroundStyle(message.role == .error ? .red : .white)
-                .padding(.horizontal, ds.messageBubbleHorizontalPadding)
-                .padding(.vertical, ds.messageBubbleVerticalPadding)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
+            
+            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
+                // Image above message if present
+                if let image = message.image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 180, height: 180)
+                        .clipShape(RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
+                }
+                
+                // Text bubble
+                if !message.text.isEmpty {
+                    Text(message.text)
+                        .font(.system(size: ds.messageTextSize, weight: .regular))
+                        .foregroundStyle(message.role == .error ? .red : .white)
+                        .padding(.horizontal, ds.messageBubbleHorizontalPadding)
+                        .padding(.vertical, ds.messageBubbleVerticalPadding)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
+                }
+            }
+            
             if message.role != .user { Spacer(minLength: 60) }
         }
     }
