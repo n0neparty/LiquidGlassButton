@@ -256,7 +256,7 @@ struct ChatView: View {
 // MARK: - Wave Loading Animation
 struct WaveLoadingAnimation: View {
     let color: Color
-    @State private var phase: CGFloat = 0
+    @State private var animating = false
     private let barCount = 5
     private let barWidth: CGFloat = 4
     private let maxHeight: CGFloat = 22
@@ -267,24 +267,18 @@ struct WaveLoadingAnimation: View {
             ForEach(0..<barCount, id: \.self) { i in
                 RoundedRectangle(cornerRadius: barWidth / 2)
                     .fill(color)
-                    .frame(width: barWidth, height: barHeight(for: i))
+                    .frame(width: barWidth, height: animating ? maxHeight : minHeight)
                     .animation(
-                        .easeInOut(duration: 0.5)
+                        .easeInOut(duration: 0.45)
                         .repeatForever(autoreverses: true)
                         .delay(Double(i) * 0.1),
-                        value: phase
+                        value: animating
                     )
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .background(.ultraThinMaterial, in: Capsule())
-        .onAppear { phase = 1 }
-    }
-
-    private func barHeight(for index: Int) -> CGFloat {
-        let offset = CGFloat(index) / CGFloat(barCount - 1)
-        let wave = sin((offset + phase) * .pi)
-        return minHeight + (maxHeight - minHeight) * ((wave + 1) / 2)
+        .onAppear { animating = true }
     }
 }
 
