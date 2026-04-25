@@ -268,6 +268,7 @@ struct HomeView: View {
                 Button { } label: {
                     Image(systemName: "arrow.up")
                         .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                        .foregroundStyle(.white)
                         .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                 }
                 .buttonStyle(.glass)
@@ -278,7 +279,7 @@ struct HomeView: View {
                     navigateToChat = true
                 } label: {
                     Image(systemName: "arrow.up")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                         .foregroundStyle(.black)
                         .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                         .background(Circle().fill(.white))
