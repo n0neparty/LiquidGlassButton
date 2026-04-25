@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct ChatView: View {
     let provider: AIProvider
@@ -9,6 +10,8 @@ struct ChatView: View {
     @State private var inputText = ""
     @State private var chatId: String?
     @State private var isLoading = false
+    @State private var selectedImage: UIImage?
+    @State private var showImagePicker = false
     @FocusState private var inputFocused: Bool
     @ObservedObject var debugSettings = DebugSettings.shared
     @Environment(\.dismiss) var dismiss
@@ -93,82 +96,114 @@ struct ChatView: View {
     
     // MARK: Input Bar с системным liquid glass
     var inputBar: some View {
-        HStack(spacing: 0) {
-            // Left buttons group
-            HStack(spacing: 6) {
-                Button { } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+        VStack(spacing: 0) {
+            // Selected image preview
+            if let image = selectedImage {
+                HStack {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 60, height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    
+                    Spacer()
+                    
+                    Button {
+                        selectedImage = nil
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 20))
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
                 }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
+                .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
+                .padding(.bottom, 8)
+            }
+            
+            HStack(spacing: 0) {
+                // Left buttons group
+                HStack(spacing: 6) {
+                    Button { 
+                        showImagePicker = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    
+                    Button { } label: {
+                        Image(systemName: "lightbulb.fill")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                }
                 
-                Button { } label: {
-                    Image(systemName: "lightbulb.fill")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                Spacer()
+                    .frame(width: 10)
+                
+                TextField("Ask anything", text: $inputText)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.white)
+                    .tint(provider.color)
+                    .focused($inputFocused)
+                    .submitLabel(.send)
+                    .onSubmit { sendMessage() }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 13)
+                    .frame(height: 44)
+                    .background(Capsule().fill(.ultraThinMaterial))
+                    .layoutPriority(-1)
+                
+                Spacer()
+                    .frame(width: debugSettings.inputBarSpacing)
+                
+                // Send button
+                if inputText.isEmpty {
+                    Button { } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    .disabled(true)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    .layoutPriority(1)
+                } else {
+                    Button { 
+                        sendMessage()
+                    } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                            .foregroundStyle(.black)
+                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    }
+                    .buttonStyle(.plain)
+                    .background(Circle().fill(.white))
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    .layoutPriority(1)
                 }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
             }
-            
-            Spacer()
-                .frame(width: 10)
-            
-            TextField("Ask anything", text: $inputText)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(.white)
-                .tint(provider.color)
-                .focused($inputFocused)
-                .submitLabel(.send)
-                .onSubmit { sendMessage() }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 13)
-                .frame(height: 44)
-                .background(Capsule().fill(.ultraThinMaterial))
-                .layoutPriority(-1)
-            
-            Spacer()
-                .frame(width: debugSettings.inputBarSpacing)
-            
-            // Send button
-            if inputText.isEmpty {
-                Button { } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .disabled(true)
-                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                .layoutPriority(1)
-            } else {
-                Button { 
-                    sendMessage()
-                } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.black)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                }
-                .buttonStyle(.plain)
-                .background(Circle().fill(.white))
-                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                .layoutPriority(1)
-            }
+            .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
+            .padding(.vertical, debugSettings.inputBarVerticalPadding)
+            .padding(.bottom, 8)
         }
-        .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
-        .padding(.vertical, debugSettings.inputBarVerticalPadding)
-        .padding(.bottom, 8)
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(image: $selectedImage)
+        }
     }
     
     private func sendMessage() {
         guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let userMsg = inputText
+        let imageToSend = selectedImage
         inputText = ""
+        selectedImage = nil
         messages.append(ChatMessage(role: .user, text: userMsg))
         isLoading = true
         
@@ -177,7 +212,8 @@ struct ChatView: View {
                 let response = try await APIService.shared.sendMessage(
                     model: model,
                     message: userMsg,
-                    chatId: chatId
+                    chatId: chatId,
+                    image: imageToSend
                 )
                 
                 if let text = response.text {
@@ -255,6 +291,45 @@ struct MessageBubble: View {
             if message.role != .user {
                 Spacer(minLength: 60)
             }
+        }
+    }
+}
+
+
+// MARK: - Image Picker
+struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var image: UIImage?
+    @Environment(\.dismiss) var dismiss
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.delegate = context.coordinator
+        picker.sourceType = .photoLibrary
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: ImagePicker
+        
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.image = image
+            }
+            parent.dismiss()
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.dismiss()
         }
     }
 }

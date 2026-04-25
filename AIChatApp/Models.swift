@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-let API_BASE = "http://YOUR_SERVER_IP:4000"
+let API_BASE = "http://1.1.1.1:4000"
 
 // MARK: - Data Models (Sendable для Swift 6)
 struct AIProvider: Identifiable, Hashable, Sendable {
