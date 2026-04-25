@@ -195,37 +195,38 @@ struct ChatView: View {
     private func sendMessage() {
         let userMsg = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !userMsg.isEmpty else { return }
+        
         let img = selectedImages.first
         let useThinking = thinkingMode
+        
         inputText = ""
         selectedImages = []
+        
         messages.append(ChatMessage(role: .user, text: userMsg, image: img))
         isLoading = true
 
         Task {
             do {
                 if useThinking {
-                    let tr = try await APIService.shared.sendMessage(
+                    _ = try await APIService.shared.sendMessage(
                         model: model,
                         message: "You are in deep thinking mode. Think carefully before answering. Reply only '1337' to confirm.",
                         chatId: chatId,
                         image: nil
                     )
-                    if let id = tr.resolvedChatId { chatId = id }
                 }
+
                 let response = try await APIService.shared.sendMessage(
                     model: model, message: userMsg, chatId: chatId, image: img
                 )
+                
                 if let id = response.resolvedChatId { chatId = id }
+                
                 if let err = response.error {
                     messages.append(ChatMessage(role: .error, text: err))
                 } else if let text = response.text {
-                    // Strip any 1337 artifacts from thinking mode
-                    let cleaned = text
-                        .replacingOccurrences(of: "1337", with: "")
-                        .replacingOccurrences(of: "-----", with: "")
-                        .trimmingCharacters(in: .whitespacesAndNewlines)
-                    await streamWords(cleaned)
+                    let cleanedText = cleanThinkingTags(text)
+                    await streamWords(cleanedText)
                 }
             } catch {
                 messages.append(ChatMessage(role: .error, text: error.localizedDescription))
@@ -234,15 +235,41 @@ struct ChatView: View {
         }
     }
 
+    /// Улучшенная очистка <think>...</think>
+    private func cleanThinkingTags(_ text: String) -> String {
+        var result = text
+        
+        if let thinkEndRange = result.range(of: "</think>", options: .caseInsensitive) {
+            result = String(result[thinkEndRange.upperBound...])
+        }
+        
+        result = result
+            .replacingOccurrences(of: "1337", with: "")
+            .replacingOccurrences(of: "-----", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Убираем пустые строки в начале
+        let lines = result.components(separatedBy: .newlines)
+        let cleanedLines = lines.drop(while: { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+        
+        result = cleanedLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        return result
+    }
+
     @MainActor
     private func streamWords(_ text: String) async {
+        guard !text.isEmpty else { return }
+        
         let words = text.components(separatedBy: " ")
         isStreaming = true
         streamingText = ""
+        
         for (i, word) in words.enumerated() {
             try? await Task.sleep(nanoseconds: 25_000_000)
             streamingText += (i == 0 ? "" : " ") + word
         }
+        
         messages.append(ChatMessage(role: .ai, text: text))
         streamingText = ""
         isStreaming = false
@@ -278,7 +305,7 @@ struct WaveLoadingAnimation: View {
     }
 }
 
-// MARK: - Message Bubble
+// MARK: - Message Bubble (исправленный)
 struct MessageBubble: View {
     let message: ChatMessage
     let providerColor: Color
@@ -286,10 +313,14 @@ struct MessageBubble: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
+            // Левый отступ
             if message.role == .user {
                 Spacer(minLength: 60)
+            } else {
+                Spacer(minLength: 12)
             }
             
+            // Сообщение
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 if let image = message.image {
                     Image(uiImage: image)
@@ -302,28 +333,24 @@ struct MessageBubble: View {
                 if !message.text.isEmpty {
                     Group {
                         if message.role == .user {
-                            // Сообщения пользователя — компактный Text
                             Text(message.text)
                                 .font(.system(size: ds.messageTextSize))
                                 .foregroundColor(.primary)
                                 .lineSpacing(0)
                                 .multilineTextAlignment(.trailing)
-                                .frame(minHeight: 0, alignment: .topLeading)
                         } else {
-                            // Сообщения AI — MarkdownText
                             MarkdownText(text: message.text, 
                                          fontSize: ds.messageTextSize, 
                                          isError: message.role == .error)
                                 .lineSpacing(2)
                                 .multilineTextAlignment(.leading)
-                                .frame(minHeight: 0, alignment: .topLeading)
                         }
                     }
                     .padding(.horizontal, ds.messageBubbleHorizontalPadding)
                     .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                            .fill(message.role == .ai ? Color(white: 0.12) : Color.clear)
+                            .fill(message.role == .ai ? Color(white: 0.15) : Color.clear)  // Тёмный фон для AI
                             .overlay(
                                 message.role == .ai
                                     ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
@@ -337,15 +364,21 @@ struct MessageBubble: View {
                             : AnyShapeStyle(Color.clear),
                         in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
                     )
+                    .frame(maxWidth: message.role == .ai ? 320 : .infinity, alignment: message.role == .user ? .trailing : .leading)
                 }
             }
             
-            if message.role != .user {
+            // Правый отступ
+            if message.role == .user {
+                Spacer(minLength: 12)
+            } else {
                 Spacer(minLength: 60)
             }
         }
+        .padding(.horizontal, 8)
     }
 }
+
 // MARK: - Image Picker
 struct AppImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
