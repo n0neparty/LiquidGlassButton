@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 
 struct ChatView: View {
     let provider: AIProvider
@@ -373,6 +372,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
         picker.sourceType = .photoLibrary
+        picker.allowsEditing = false
         return picker
     }
     
