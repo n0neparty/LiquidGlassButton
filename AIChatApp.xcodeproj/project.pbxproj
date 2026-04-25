@@ -19,7 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1000010 /* AIChatApp.app */     = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIChatApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000010 /* Freedom.app */       = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Freedom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000011 /* AIChatApp.swift */   = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatApp.swift;  sourceTree = "<group>"; };
 		A1000012 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1000013 /* HomeView.swift */    = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift;    sourceTree = "<group>"; };
@@ -64,14 +64,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A1000030 /* AIChatApp */ = {
+		A1000030 /* Freedom */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1000050;
 			buildPhases = (A1000031, A1000032);
 			buildRules = ();
 			dependencies = ();
-			name = AIChatApp;
-			productName = AIChatApp;
+			name = Freedom;
+			productName = Freedom;
 			productReference = A1000010;
 			productType = "com.apple.product-type.application";
 		};
@@ -173,7 +173,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aichat.free;
-				PRODUCT_NAME = AIChatApp;
+				PRODUCT_NAME = Freedom;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -196,7 +196,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aichat.free;
-				PRODUCT_NAME = AIChatApp;
+				PRODUCT_NAME = Freedom;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

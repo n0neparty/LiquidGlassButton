@@ -10,7 +10,7 @@ workflows:
         script: |
           xcodebuild \
             -project AIChatApp.xcodeproj \
-            -scheme AIChatApp \
+            -scheme Freedom \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -derivedDataPath build/DerivedData \
@@ -26,8 +26,8 @@ workflows:
           mkdir -p build/Payload
           cp -r "$APP_PATH" build/Payload/
           cd build
-          zip -r AIChatApp.ipa Payload/
-          echo "IPA created: $(ls -lh AIChatApp.ipa)"
+          zip -r Freedom.ipa Payload/
+          echo "IPA created: $(ls -lh Freedom.ipa)"
 
     artifacts:
-      - build/AIChatApp.ipa
+      - build/Freedom.ipa
