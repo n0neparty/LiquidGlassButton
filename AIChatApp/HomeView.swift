@@ -77,7 +77,12 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background {
+                        ZStack {
+                            Circle().fill(Color.white.opacity(0.15))
+                            Circle().fill(.ultraThinMaterial)
+                        }
+                    }
             }
 
             // History button - круглая с системным liquid glass
@@ -86,7 +91,12 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background {
+                        ZStack {
+                            Circle().fill(Color.white.opacity(0.15))
+                            Circle().fill(.ultraThinMaterial)
+                        }
+                    }
             }
 
             Spacer()
@@ -112,7 +122,12 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background(.ultraThinMaterial, in: Capsule())
+                .background {
+                    ZStack {
+                        Capsule().fill(Color.white.opacity(0.15))
+                        Capsule().fill(.ultraThinMaterial)
+                    }
+                }
             }
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
@@ -124,7 +139,12 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background {
+                        ZStack {
+                            Circle().fill(Color.white.opacity(0.15))
+                            Circle().fill(.ultraThinMaterial)
+                        }
+                    }
             }
         }
         .padding(.horizontal, 16)
@@ -157,7 +177,14 @@ struct HomeView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(Color.white.opacity(0.15))
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                }
+            }
             .padding(.top, 20)
         }
         .padding(.horizontal, 32)
@@ -199,7 +226,14 @@ struct HomeView: View {
                         }
                         .frame(width: 160, alignment: .leading)
                         .padding(16)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .background {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .fill(Color.white.opacity(0.15))
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .fill(.ultraThinMaterial)
+                            }
+                        }
                     }
                 }
             }

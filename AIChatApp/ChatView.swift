@@ -75,7 +75,12 @@ struct ChatView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background {
+                        ZStack {
+                            Circle().fill(Color.white.opacity(0.15))
+                            Circle().fill(.ultraThinMaterial)
+                        }
+                    }
             }
             
             Button { } label: {
@@ -83,7 +88,12 @@ struct ChatView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background {
+                        ZStack {
+                            Circle().fill(Color.white.opacity(0.15))
+                            Circle().fill(.ultraThinMaterial)
+                        }
+                    }
             }
             
             TextField("Ask anything", text: $inputText)
@@ -95,7 +105,12 @@ struct ChatView: View {
                 .onSubmit { sendMessage() }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 13)
-                .background(.ultraThinMaterial, in: Capsule())
+                .background {
+                    ZStack {
+                        Capsule().fill(Color.white.opacity(0.15))
+                        Capsule().fill(.ultraThinMaterial)
+                    }
+                }
             
             Button { sendMessage() } label: {
                 if isLoading {
@@ -110,7 +125,10 @@ struct ChatView: View {
                         .frame(width: 44, height: 44)
                         .background {
                             if inputText.isEmpty {
-                                Circle().fill(.ultraThinMaterial)
+                                ZStack {
+                                    Circle().fill(Color.white.opacity(0.15))
+                                    Circle().fill(.ultraThinMaterial)
+                                }
                             } else {
                                 Circle().fill(.white)
                             }
@@ -173,7 +191,14 @@ struct MessageBubble: View {
                 .foregroundStyle(message.role == .error ? .red : .white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .background {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(Color.white.opacity(0.15))
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                    }
+                }
             
             if message.role != .user {
                 Spacer(minLength: 60)
