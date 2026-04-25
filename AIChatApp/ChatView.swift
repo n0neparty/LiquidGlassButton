@@ -36,7 +36,7 @@ struct ChatView: View {
                 // Messages
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(spacing: 16) {
+                        LazyVStack(spacing: debugSettings.messageSpacing) {
                             ForEach(messages) { msg in
                                 MessageBubble(message: msg, providerColor: provider.color)
                                     .id(msg.id)
@@ -87,10 +87,10 @@ struct ChatView: View {
     
     // MARK: Input Bar с системным liquid glass
     var inputBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: debugSettings.inputBarSpacing) {
             Button { } label: {
                 Image(systemName: "plus")
-                    .font(.title3.bold())
+                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                     .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
@@ -98,7 +98,7 @@ struct ChatView: View {
             
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
-                    .font(.title3.bold())
+                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                     .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
@@ -132,7 +132,7 @@ struct ChatView: View {
             } else if inputText.isEmpty {
                 Button { } label: {
                     Image(systemName: "arrow.up")
-                        .font(.title3.bold())
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                         .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                 }
                 .buttonStyle(.glass)
@@ -148,8 +148,8 @@ struct ChatView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
+        .padding(.vertical, debugSettings.inputBarVerticalPadding)
         .padding(.bottom, 8)
     }
     
@@ -189,6 +189,7 @@ struct ChatView: View {
 struct MessageBubble: View {
     let message: ChatMessage
     let providerColor: Color
+    @ObservedObject var debugSettings = DebugSettings.shared
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -197,11 +198,11 @@ struct MessageBubble: View {
             }
             
             Text(message.text)
-                .font(.system(size: 15, weight: .regular))
+                .font(.system(size: debugSettings.messageTextSize, weight: .regular))
                 .foregroundStyle(message.role == .error ? .red : .white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .padding(.horizontal, debugSettings.messageBubbleHorizontalPadding)
+                .padding(.vertical, debugSettings.messageBubbleVerticalPadding)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: debugSettings.messageBubbleCornerRadius, style: .continuous))
             
             if message.role != .user {
                 Spacer(minLength: 60)

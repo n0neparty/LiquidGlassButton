@@ -4,6 +4,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var selectedProvider: AIProvider
     @Binding var selectedModel: AIModel
+    @ObservedObject var debugSettings = DebugSettings.shared
     
     var body: some View {
         NavigationStack {
@@ -66,7 +67,7 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
-                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: debugSettings.settingsCardCornerRadius, style: .continuous))
                                     }
                                 }
                             }
@@ -121,7 +122,7 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
-                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: debugSettings.settingsCardCornerRadius, style: .continuous))
                                     }
                                 }
                             }

@@ -75,7 +75,7 @@ struct HomeView: View {
 
     // MARK: Top Bar (Header) с настоящим liquid glass
     var topBar: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: debugSettings.topBarSpacing) {
             // Settings + History combined button
             Menu {
                 Button {
@@ -94,7 +94,7 @@ struct HomeView: View {
                 }
             } label: {
                 Image(systemName: "line.3.horizontal")
-                    .font(.title3.bold())
+                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                     .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
@@ -106,14 +106,14 @@ struct HomeView: View {
             Button { showSettings = true } label: {
                 HStack(spacing: 6) {
                     Image(systemName: selectedProvider.icon)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: debugSettings.modelPillIconSize, weight: .semibold))
                         .foregroundStyle(selectedProvider.color)
                     Text(selectedModel.name)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: debugSettings.modelPillTextSize, weight: .semibold))
                         .foregroundStyle(.white)
                     if let badge = selectedModel.badge {
                         Text(badge)
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: debugSettings.modelPillBadgeSize, weight: .bold))
                             .foregroundStyle(selectedProvider.color)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
@@ -121,6 +121,8 @@ struct HomeView: View {
                             .clipShape(Capsule())
                     }
                 }
+                .padding(.horizontal, debugSettings.modelPillHorizontalPadding)
+                .padding(.vertical, debugSettings.modelPillVerticalPadding)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.capsule)
@@ -131,14 +133,14 @@ struct HomeView: View {
             // New chat button
             Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
-                    .font(.title3.bold())
+                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                     .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.horizontal, debugSettings.topBarHorizontalPadding)
+        .padding(.top, debugSettings.topBarTopPadding)
     }
 
     // MARK: Loading View
@@ -196,25 +198,25 @@ struct HomeView: View {
     // MARK: Suggestion Chips (Action Cards) - квадратные без liquid glass
     var suggestionChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
+            HStack(spacing: debugSettings.suggestionChipsSpacing) {
                 ForEach(Array(suggestions.enumerated()), id: \.offset) { _, s in
                     Button {
                         inputText = "\(s.0) \(s.1)"
                         navigateToChat = true
                     } label: {
-                        VStack(alignment: .leading, spacing: 5) {
+                        VStack(alignment: .leading, spacing: debugSettings.suggestionChipSpacing) {
                             Text(s.0)
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: debugSettings.suggestionTitleSize, weight: .semibold))
                                 .foregroundStyle(.white)
                             Text(s.1)
-                                .font(.system(size: 14, weight: .regular))
+                                .font(.system(size: debugSettings.suggestionSubtitleSize, weight: .regular))
                                 .foregroundStyle(.white.opacity(0.6))
                         }
-                        .frame(width: 150, alignment: .leading)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
+                        .frame(width: debugSettings.suggestionChipWidth, alignment: .leading)
+                        .padding(.horizontal, debugSettings.suggestionChipHorizontalPadding)
+                        .padding(.vertical, debugSettings.suggestionChipVerticalPadding)
                         .background(Color.white.opacity(0.08))
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: debugSettings.suggestionChipCornerRadius, style: .continuous))
                     }
                 }
             }
@@ -225,11 +227,11 @@ struct HomeView: View {
 
     // MARK: Input Bar (Sticky Bottom)
     var inputBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: debugSettings.inputBarSpacing) {
             // Plus button
             Button { } label: {
                 Image(systemName: "plus")
-                    .font(.title3.bold())
+                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                     .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
@@ -238,7 +240,7 @@ struct HomeView: View {
             // Lightbulb button
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
-                    .font(.title3.bold())
+                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                     .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
             }
             .buttonStyle(.glass)
@@ -265,7 +267,7 @@ struct HomeView: View {
             if inputText.isEmpty {
                 Button { } label: {
                     Image(systemName: "arrow.up")
-                        .font(.title3.bold())
+                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
                         .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
                 }
                 .buttonStyle(.glass)
@@ -283,8 +285,8 @@ struct HomeView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
+        .padding(.vertical, debugSettings.inputBarVerticalPadding)
         .padding(.bottom, 8)
     }
 }
