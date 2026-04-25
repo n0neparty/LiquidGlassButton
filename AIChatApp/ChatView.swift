@@ -19,7 +19,6 @@ struct ChatView: View {
     @FocusState private var inputFocused: Bool
     @Environment(\.dismiss) var dismiss
 
-    // Access shared settings
     var ds: DebugSettings { DebugSettings.shared }
 
     var body: some View {
@@ -32,42 +31,11 @@ struct ChatView: View {
             .blur(radius: 90).ignoresSafeArea()
 
             VStack(spacing: 0) {
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack(spacing: ds.messageSpacing) {
-                            ForEach(messages) { msg in
-                                MessageBubble(message: msg, providerColor: provider.color)
-                                    .id(msg.id)
-                            }
-                            // Streaming bubble
-                            if isStreaming && !streamingText.isEmpty {
-                                MessageBubble(
-                                    message: ChatMessage(role: .ai, text: streamingText),
-                                    providerColor: provider.color
-                                )
-                                .id("streaming")
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 20)
-                    }
-                    .onChange(of: messages.count) { _, _ in
-                        if let last = messages.last {
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                proxy.scrollTo(last.id, anchor: .bottom)
-                            }
-                        }
-                    }
-                    .onChange(of: streamingText) { _, _ in
-                        withAnimation { proxy.scrollTo("streaming", anchor: .bottom) }
-                    }
-                }
-
+                messageList
                 if isLoading {
                     WaveLoadingAnimation(color: provider.color)
                         .padding(.bottom, 12)
                 }
-
                 inputBar
             }
         }
@@ -94,6 +62,38 @@ struct ChatView: View {
             if !initialMessage.isEmpty {
                 inputText = initialMessage
                 sendMessage()
+            }
+        }
+    }
+
+    var messageList: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: ds.messageSpacing) {
+                    ForEach(messages) { msg in
+                        MessageBubble(message: msg, providerColor: provider.color)
+                            .id(msg.id)
+                    }
+                    if isStreaming && !streamingText.isEmpty {
+                        MessageBubble(
+                            message: ChatMessage(role: .ai, text: streamingText),
+                            providerColor: provider.color
+                        )
+                        .id("streaming")
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 20)
+            }
+            .onChange(of: messages.count) { _, _ in
+                if let last = messages.last {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        proxy.scrollTo(last.id, anchor: .bottom)
+                    }
+                }
+            }
+            .onChange(of: streamingText) { _, _ in
+                withAnimation { proxy.scrollTo("streaming", anchor: .bottom) }
             }
         }
     }
@@ -193,63 +193,54 @@ struct ChatView: View {
     }
 
     private func sendMessage() {
-        guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        let userMsg = inputText
-        let imagesToSend = selectedImages
+        let userMsg = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !userMsg.isEmpty else { return }
+        let img = selectedImages.first
         let useThinking = thinkingMode
         inputText = ""
         selectedImages = []
-        messages.append(ChatMessage(role: .user, text: userMsg, image: imagesToSend.first))
+        messages.append(ChatMessage(role: .user, text: userMsg, image: img))
         isLoading = true
 
         Task {
             do {
                 if useThinking {
-                    let thinkingPrompt = "You are now in deep thinking mode. Think step by step. If you understand, respond with exactly: 1337"
-                    let thinkingResponse = try await APIService.shared.sendMessage(
-                        model: model, message: thinkingPrompt, chatId: chatId, image: nil
+                    let tr = try await APIService.shared.sendMessage(
+                        model: model,
+                        message: "Think step by step. If ready, respond: 1337",
+                        chatId: chatId,
+                        image: nil
                     )
-                    if let id = thinkingResponse.resolvedChatId { chatId = id }
-
-                    let response = try await APIService.shared.sendMessage(
-                        model: model, message: userMsg, chatId: chatId,
-                        image: imagesToSend.first
-                    )
-                    handleResponse(response)
-                } else {
-                    let response = try await APIService.shared.sendMessage(
-                        model: model, message: userMsg, chatId: chatId,
-                        image: imagesToSend.first
-                    )
-                    handleResponse(response)
+                    if let id = tr.resolvedChatId { chatId = id }
+                }
+                let response = try await APIService.shared.sendMessage(
+                    model: model, message: userMsg, chatId: chatId, image: img
+                )
+                if let id = response.resolvedChatId { chatId = id }
+                if let err = response.error {
+                    messages.append(ChatMessage(role: .error, text: err))
+                } else if let text = response.text {
+                    await streamWords(text)
                 }
             } catch {
-                messages.append(ChatMessage(role: .error, text: "Error: \(error.localizedDescription)"))
+                messages.append(ChatMessage(role: .error, text: error.localizedDescription))
             }
             isLoading = false
         }
     }
 
-    private func handleResponse(_ response: ChatResponse) {
-        if let text = response.text {
-            if let id = response.resolvedChatId { chatId = id }
-            // Animate text word by word
-            let words = text.components(separatedBy: " ")
-            isStreaming = true
-            streamingText = ""
-            Task {
-                for (i, word) in words.enumerated() {
-                    try? await Task.sleep(nanoseconds: 30_000_000)
-                    streamingText += (i == 0 ? "" : " ") + word
-                }
-                // Commit to messages
-                messages.append(ChatMessage(role: .ai, text: text))
-                streamingText = ""
-                isStreaming = false
-            }
+    @MainActor
+    private func streamWords(_ text: String) async {
+        let words = text.components(separatedBy: " ")
+        isStreaming = true
+        streamingText = ""
+        for (i, word) in words.enumerated() {
+            try? await Task.sleep(nanoseconds: 25_000_000)
+            streamingText += (i == 0 ? "" : " ") + word
         }
-        if let id = response.resolvedChatId { chatId = id }
-        if let error = response.error { messages.append(ChatMessage(role: .error, text: error)) }
+        messages.append(ChatMessage(role: .ai, text: text))
+        streamingText = ""
+        isStreaming = false
     }
 }
 
@@ -286,24 +277,18 @@ struct WaveLoadingAnimation: View {
 struct MessageBubble: View {
     let message: ChatMessage
     let providerColor: Color
-
     var ds: DebugSettings { DebugSettings.shared }
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             if message.role == .user { Spacer(minLength: 60) }
-            
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                // Image above message if present
                 if let image = message.image {
                     Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
+                        .resizable().scaledToFill()
                         .frame(width: 180, height: 180)
                         .clipShape(RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
                 }
-                
-                // Text bubble
                 if !message.text.isEmpty {
                     Text(message.text)
                         .font(.system(size: ds.messageTextSize, weight: .regular))
@@ -312,13 +297,12 @@ struct MessageBubble: View {
                         .padding(.vertical, ds.messageBubbleVerticalPadding)
                         .background(
                             message.role == .ai
-                                ? Color(white: 0.12)
-                                : .ultraThinMaterial,
+                                ? AnyShapeStyle(Color(white: 0.12))
+                                : AnyShapeStyle(.ultraThinMaterial),
                             in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
                         )
                 }
             }
-            
             if message.role != .user { Spacer(minLength: 60) }
         }
     }
