@@ -71,27 +71,27 @@ struct HomeView: View {
     // MARK: Top Bar (Header)
     var topBar: some View {
         HStack(spacing: 12) {
-            // Settings button - круглая
+            // Settings button - круглая с системным liquid glass
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(Color.white.opacity(0.1), in: Circle())
+                    .background(.ultraThinMaterial, in: Circle())
             }
 
-            // History button - круглая
+            // History button - круглая с системным liquid glass
             Button { } label: {
                 Image(systemName: "bubble.left.fill")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(Color.white.opacity(0.1), in: Circle())
+                    .background(.ultraThinMaterial, in: Circle())
             }
 
             Spacer()
 
-            // Current model pill
+            // Current model pill с системным liquid glass
             Button { showSettings = true } label: {
                 HStack(spacing: 6) {
                     Image(systemName: selectedProvider.icon)
@@ -112,19 +112,19 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background(Color.white.opacity(0.1), in: Capsule())
+                .background(.ultraThinMaterial, in: Capsule())
             }
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
             Spacer()
 
-            // New chat button - круглая
+            // New chat button - круглая с системным liquid glass
             Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .frame(width: 44, height: 44)
-                    .background(Color.white.opacity(0.1), in: Circle())
+                    .background(.ultraThinMaterial, in: Circle())
             }
         }
         .padding(.horizontal, 16)
@@ -146,7 +146,7 @@ struct HomeView: View {
                 .lineSpacing(4)
                 .padding(.horizontal, 40)
             
-            // Loading indicator
+            // Loading indicator с системным liquid glass
             HStack(spacing: 8) {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .white.opacity(0.6)))
@@ -157,7 +157,7 @@ struct HomeView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
-            .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             .padding(.top, 20)
         }
         .padding(.horizontal, 32)
@@ -180,7 +180,7 @@ struct HomeView: View {
         .padding(.horizontal, 32)
     }
 
-    // MARK: Suggestion Chips (Action Cards)
+    // MARK: Suggestion Chips (Action Cards) с системным liquid glass
     var suggestionChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -199,7 +199,7 @@ struct HomeView: View {
                         }
                         .frame(width: 160, alignment: .leading)
                         .padding(16)
-                        .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                     }
                 }
             }
