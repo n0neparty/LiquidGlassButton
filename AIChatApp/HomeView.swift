@@ -87,25 +87,25 @@ struct HomeView: View {
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.large)
+            .controlSize(.regular)
 
             Spacer()
 
             // Current model pill
             Button { showSettings = true } label: {
-                HStack(spacing: 5) {
+                HStack(spacing: 6) {
                     Image(systemName: selectedProvider.icon)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(selectedProvider.color)
                     Text(selectedModel.name)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
                     if let badge = selectedModel.badge {
                         Text(badge)
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(selectedProvider.color)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
                             .background(selectedProvider.color.opacity(0.2))
                             .clipShape(Capsule())
                     }
@@ -125,7 +125,7 @@ struct HomeView: View {
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.large)
+            .controlSize(.regular)
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -223,7 +223,7 @@ struct HomeView: View {
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.large)
+            .controlSize(.regular)
             
             // Lightbulb button
             Button { } label: {
@@ -232,7 +232,7 @@ struct HomeView: View {
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.large)
+            .controlSize(.regular)
 
             // Text input
             ZStack {
@@ -259,7 +259,7 @@ struct HomeView: View {
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
-                .controlSize(.large)
+                .controlSize(.regular)
                 .disabled(true)
             } else {
                 Button {
@@ -268,7 +268,7 @@ struct HomeView: View {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.black)
-                        .frame(width: 44, height: 44)
+                        .frame(width: 40, height: 40)
                         .background(Circle().fill(.white))
                 }
             }

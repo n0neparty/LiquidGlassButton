@@ -56,6 +56,20 @@ struct ChatView: View {
                 inputBar
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    // Navigation back
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.title3.bold())
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .controlSize(.large)
+            }
+        }
         .navigationTitle(model.name)
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
@@ -76,7 +90,7 @@ struct ChatView: View {
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.large)
+            .controlSize(.regular)
             
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
@@ -84,7 +98,7 @@ struct ChatView: View {
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.large)
+            .controlSize(.regular)
             
             ZStack {
                 Capsule()
@@ -107,7 +121,7 @@ struct ChatView: View {
                 Button { } label: {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 40, height: 40)
                         .background(Circle().fill(.white))
                 }
                 .disabled(true)
@@ -118,14 +132,14 @@ struct ChatView: View {
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
-                .controlSize(.large)
+                .controlSize(.regular)
                 .disabled(true)
             } else {
                 Button { sendMessage() } label: {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.black)
-                        .frame(width: 44, height: 44)
+                        .frame(width: 40, height: 40)
                         .background(Circle().fill(.white))
                 }
             }
