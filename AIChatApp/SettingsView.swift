@@ -105,10 +105,6 @@ struct SettingsView: View {
                                                             .clipShape(Capsule())
                                                     }
                                                 }
-                                                
-                                                Text("\(model.apiProvider) • \(model.apiModel)")
-                                                    .font(.system(size: 12, weight: .regular))
-                                                    .foregroundStyle(.white.opacity(0.4))
                                             }
                                             
                                             Spacer()
