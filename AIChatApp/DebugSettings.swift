@@ -17,7 +17,7 @@ class DebugSettings: ObservableObject {
     @Published var inputBarHorizontalPadding: CGFloat = 16
     @Published var inputBarVerticalPadding: CGFloat = 12
     @Published var topBarHorizontalPadding: CGFloat = 11
-    @Published var topBarTopPadding: CGFloat = 7
+    @Published var topBarTopPadding: CGFloat = 6
     @Published var modelPillHorizontalPadding: CGFloat = 14
     @Published var modelPillVerticalPadding: CGFloat = 8
     @Published var suggestionChipHorizontalPadding: CGFloat = 14
@@ -57,7 +57,7 @@ class DebugSettings: ObservableObject {
         inputBarHorizontalPadding = 16
         inputBarVerticalPadding = 12
         topBarHorizontalPadding = 11
-        topBarTopPadding = 7
+        topBarTopPadding = 6
         modelPillHorizontalPadding = 14
         modelPillVerticalPadding = 8
         suggestionChipHorizontalPadding = 14

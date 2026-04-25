@@ -264,27 +264,27 @@ struct HomeView: View {
             .frame(height: 44)
 
             // Send button - полностью белая
-            if inputText.isEmpty {
-                Button { } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .disabled(true)
-            } else {
-                Button {
+            Button {
+                if !inputText.isEmpty {
                     navigateToChat = true
-                } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                        .foregroundStyle(.black)
-                        .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                        .background(Circle().fill(.white))
                 }
+            } label: {
+                Image(systemName: "arrow.up")
+                    .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                    .foregroundStyle(inputText.isEmpty ? .white : .black)
+                    .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                    .background {
+                        if inputText.isEmpty {
+                            Color.clear
+                        } else {
+                            Circle().fill(.white)
+                        }
+                    }
             }
+            .buttonStyle(inputText.isEmpty ? .glass : .borderless)
+            .buttonBorderShape(.circle)
+            .disabled(inputText.isEmpty)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: inputText.isEmpty)
         }
         .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
         .padding(.vertical, debugSettings.inputBarVerticalPadding)
