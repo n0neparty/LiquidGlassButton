@@ -111,6 +111,7 @@ struct HomeView: View {
                     Text(selectedModel.name)
                         .font(.system(size: debugSettings.modelPillTextSize, weight: .semibold))
                         .foregroundStyle(.white)
+                        .lineLimit(1)
                     if let badge = selectedModel.badge {
                         Text(badge)
                             .font(.system(size: debugSettings.modelPillBadgeSize, weight: .bold))
@@ -123,6 +124,7 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, debugSettings.modelPillHorizontalPadding)
                 .padding(.vertical, debugSettings.modelPillVerticalPadding)
+                .fixedSize(horizontal: false, vertical: true)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.capsule)
