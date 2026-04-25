@@ -295,9 +295,7 @@ struct MessageBubble: View {
                         .clipShape(RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
                 }
                 if !message.text.isEmpty {
-                    Text(message.text)
-                        .font(.system(size: ds.messageTextSize, weight: .regular))
-                        .foregroundStyle(message.role == .error ? .red : .white)
+                    MarkdownText(text: message.text, fontSize: ds.messageTextSize, isError: message.role == .error)
                         .padding(.horizontal, ds.messageBubbleHorizontalPadding)
                         .padding(.vertical, ds.messageBubbleVerticalPadding)
                         .background(
@@ -349,4 +347,117 @@ struct AppImagePicker: UIViewControllerRepresentable {
         }
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { parent.dismiss() }
     }
+}
+
+// MARK: - Markdown Text
+struct MarkdownText: View {
+    let text: String
+    let fontSize: CGFloat
+    let isError: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(Array(parseBlocks(text).enumerated()), id: \.offset) { _, block in
+                blockView(block)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func blockView(_ block: MDBlock) -> some View {
+        switch block {
+        case .h1(let t):
+            Text(t)
+                .font(.system(size: fontSize + 8, weight: .bold))
+                .foregroundStyle(isError ? .red : .white)
+        case .h2(let t):
+            Text(t)
+                .font(.system(size: fontSize + 5, weight: .bold))
+                .foregroundStyle(isError ? .red : .white)
+        case .h3(let t):
+            HStack(spacing: 6) {
+                Circle().fill(Color.white.opacity(0.7)).frame(width: 5, height: 5)
+                Text(t)
+                    .font(.system(size: fontSize + 2, weight: .semibold))
+                    .foregroundStyle(isError ? .red : .white)
+            }
+        case .bullet(let t):
+            HStack(alignment: .top, spacing: 8) {
+                Text("•").font(.system(size: fontSize)).foregroundStyle(.white.opacity(0.7))
+                inlineText(t)
+            }
+        case .code(let t):
+            Text(t)
+                .font(.system(size: fontSize - 1, design: .monospaced))
+                .foregroundStyle(.green.opacity(0.9))
+                .padding(8)
+                .background(Color.white.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+        case .paragraph(let t):
+            inlineText(t)
+        case .divider:
+            Divider().background(Color.white.opacity(0.2))
+        }
+    }
+
+    @ViewBuilder
+    private func inlineText(_ raw: String) -> some View {
+        if let attr = try? AttributedString(markdown: raw, options: .init(interpretedSyntax: .inlinesOnlyPreservingWhitespace)) {
+            Text(attr)
+                .font(.system(size: fontSize, weight: .regular))
+                .foregroundStyle(isError ? .red : .white)
+                .tint(.cyan)
+        } else {
+            Text(raw)
+                .font(.system(size: fontSize, weight: .regular))
+                .foregroundStyle(isError ? .red : .white)
+        }
+    }
+
+    private func parseBlocks(_ input: String) -> [MDBlock] {
+        let lines = input.components(separatedBy: "\n")
+        var blocks: [MDBlock] = []
+        var codeBuffer: [String] = []
+        var inCode = false
+
+        for line in lines {
+            if line.hasPrefix("```") {
+                if inCode {
+                    blocks.append(.code(codeBuffer.joined(separator: "\n")))
+                    codeBuffer = []
+                    inCode = false
+                } else {
+                    inCode = true
+                }
+                continue
+            }
+            if inCode { codeBuffer.append(line); continue }
+
+            if line.hasPrefix("### ") {
+                blocks.append(.h3(String(line.dropFirst(4))))
+            } else if line.hasPrefix("## ") {
+                blocks.append(.h2(String(line.dropFirst(3))))
+            } else if line.hasPrefix("# ") {
+                blocks.append(.h1(String(line.dropFirst(2))))
+            } else if line.hasPrefix("- ") || line.hasPrefix("* ") {
+                blocks.append(.bullet(String(line.dropFirst(2))))
+            } else if line.trimmingCharacters(in: .whitespaces) == "---" || line.trimmingCharacters(in: .whitespaces) == "***" {
+                blocks.append(.divider)
+            } else if line.trimmingCharacters(in: .whitespaces).isEmpty {
+                // skip empty lines
+            } else {
+                blocks.append(.paragraph(line))
+            }
+        }
+        return blocks
+    }
+}
+
+enum MDBlock {
+    case h1(String), h2(String), h3(String)
+    case bullet(String)
+    case code(String)
+    case paragraph(String)
+    case divider
 }
