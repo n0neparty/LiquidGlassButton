@@ -94,19 +94,20 @@ struct ChatView: View {
                             ZStack(alignment: .topTrailing) {
                                 Image(uiImage: image)
                                     .resizable().scaledToFill()
-                                    .frame(width: 60, height: 60)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                    .frame(width: 64, height: 64)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                 Button { selectedImages.remove(at: index) } label: {
                                     Image(systemName: "xmark.circle.fill")
                                         .font(.system(size: 20))
                                         .foregroundStyle(.white)
-                                        .background(Circle().fill(.black.opacity(0.5)))
+                                        .background(Circle().fill(.black.opacity(0.6)))
                                 }
-                                .offset(x: 6, y: -6)
+                                .offset(x: 8, y: -8)
                             }
                         }
                     }
                     .padding(.horizontal, ds.inputBarHorizontalPadding)
+                    .padding(.top, 10)
                 }
                 .padding(.bottom, 8)
             }
