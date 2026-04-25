@@ -13,6 +13,7 @@
 		A1000004 /* APIService.swift in Sources */   = {isa = PBXBuildFile; fileRef = A1000014; };
 		A1000005 /* Models.swift in Sources */       = {isa = PBXBuildFile; fileRef = A1000015; };
 		A1000006 /* Assets.xcassets in Resources */  = {isa = PBXBuildFile; fileRef = A1000016; };
+		A1000007 /* ChatView.swift in Sources */     = {isa = PBXBuildFile; fileRef = A1000017; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		A1000014 /* APIService.swift */  = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift;  sourceTree = "<group>"; };
 		A1000015 /* Models.swift */      = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift;      sourceTree = "<group>"; };
 		A1000016 /* Assets.xcassets */   = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1000017 /* ChatView.swift */    = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift;    sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -37,6 +39,7 @@
 				A1000011 /* AIChatApp.swift */,
 				A1000012 /* ContentView.swift */,
 				A1000013 /* HomeView.swift */,
+				A1000017 /* ChatView.swift */,
 				A1000014 /* APIService.swift */,
 				A1000015 /* Models.swift */,
 				A1000016 /* Assets.xcassets */,
@@ -96,6 +99,7 @@
 				A1000001 /* AIChatApp.swift in Sources */,
 				A1000002 /* ContentView.swift in Sources */,
 				A1000003 /* HomeView.swift in Sources */,
+				A1000007 /* ChatView.swift in Sources */,
 				A1000004 /* APIService.swift in Sources */,
 				A1000005 /* Models.swift in Sources */,
 			);
