@@ -84,10 +84,10 @@ struct HomeView: View {
             } label: {
                 Image(systemName: "line.3.horizontal")
                     .font(.title3.bold())
+                    .frame(width: 40, height: 40)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.regular)
 
             Spacer()
 
@@ -113,7 +113,6 @@ struct HomeView: View {
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.capsule)
-            .controlSize(.regular)
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
             Spacer()
@@ -122,10 +121,10 @@ struct HomeView: View {
             Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
                     .font(.title3.bold())
+                    .frame(width: 40, height: 40)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.regular)
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -220,19 +219,19 @@ struct HomeView: View {
             Button { } label: {
                 Image(systemName: "plus")
                     .font(.title3.bold())
+                    .frame(width: 40, height: 40)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.regular)
             
             // Lightbulb button
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.title3.bold())
+                    .frame(width: 40, height: 40)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.regular)
 
             // Text input
             ZStack {
@@ -256,10 +255,10 @@ struct HomeView: View {
                 Button { } label: {
                     Image(systemName: "arrow.up")
                         .font(.title3.bold())
+                        .frame(width: 40, height: 40)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
-                .controlSize(.regular)
                 .disabled(true)
             } else {
                 Button {

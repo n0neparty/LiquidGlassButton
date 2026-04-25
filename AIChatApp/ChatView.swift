@@ -64,10 +64,10 @@ struct ChatView: View {
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.title3.bold())
+                        .frame(width: 40, height: 40)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
-                .controlSize(.regular)
             }
         }
         .navigationTitle(model.name)
@@ -87,18 +87,18 @@ struct ChatView: View {
             Button { } label: {
                 Image(systemName: "plus")
                     .font(.title3.bold())
+                    .frame(width: 40, height: 40)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.regular)
             
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.title3.bold())
+                    .frame(width: 40, height: 40)
             }
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
-            .controlSize(.regular)
             
             ZStack {
                 Capsule()
@@ -129,10 +129,10 @@ struct ChatView: View {
                 Button { } label: {
                     Image(systemName: "arrow.up")
                         .font(.title3.bold())
+                        .frame(width: 40, height: 40)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
-                .controlSize(.regular)
                 .disabled(true)
             } else {
                 Button { sendMessage() } label: {
