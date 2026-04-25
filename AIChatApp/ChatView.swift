@@ -207,7 +207,7 @@ struct ChatView: View {
                 if useThinking {
                     let tr = try await APIService.shared.sendMessage(
                         model: model,
-                        message: "Think step by step. If ready, respond: 1337",
+                        message: "You are in deep thinking mode. Think carefully before answering. Reply only '1337' to confirm.",
                         chatId: chatId,
                         image: nil
                     )
@@ -220,7 +220,12 @@ struct ChatView: View {
                 if let err = response.error {
                     messages.append(ChatMessage(role: .error, text: err))
                 } else if let text = response.text {
-                    await streamWords(text)
+                    // Strip any 1337 artifacts from thinking mode
+                    let cleaned = text
+                        .replacingOccurrences(of: "1337", with: "")
+                        .replacingOccurrences(of: "-----", with: "")
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                    await streamWords(cleaned)
                 }
             } catch {
                 messages.append(ChatMessage(role: .error, text: error.localizedDescription))
@@ -296,9 +301,19 @@ struct MessageBubble: View {
                         .padding(.horizontal, ds.messageBubbleHorizontalPadding)
                         .padding(.vertical, ds.messageBubbleVerticalPadding)
                         .background(
-                            message.role == .ai
-                                ? AnyShapeStyle(Color(white: 0.12))
-                                : AnyShapeStyle(.ultraThinMaterial),
+                            RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                                .fill(message.role == .ai ? Color(white: 0.12) : Color.clear)
+                                .overlay(
+                                    message.role == .ai
+                                        ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                                            .fill(providerColor.opacity(0.08))
+                                        : nil
+                                )
+                        )
+                        .background(
+                            message.role != .ai
+                                ? AnyShapeStyle(.ultraThinMaterial)
+                                : AnyShapeStyle(Color.clear),
                             in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
                         )
                 }
