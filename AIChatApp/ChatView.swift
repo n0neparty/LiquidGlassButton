@@ -31,7 +31,9 @@ struct ChatView: View {
             .blur(radius: 90).ignoresSafeArea()
             VStack(spacing: 0) {
                 messageList
-                if isLoading { WaveLoadingAnimation(color: provider.color) }
+                if isLoading {
+                    WaveLoadingAnimation(color: provider.color)
+                }
                 inputBar
             }
         }
