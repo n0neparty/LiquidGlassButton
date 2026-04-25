@@ -286,41 +286,66 @@ struct MessageBubble: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            if message.role == .user { Spacer(minLength: 60) }
+            if message.role == .user {
+                Spacer(minLength: 60)
+            }
+            
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 if let image = message.image {
                     Image(uiImage: image)
-                        .resizable().scaledToFill()
+                        .resizable()
+                        .scaledToFill()
                         .frame(width: 180, height: 180)
                         .clipShape(RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
                 }
+                
                 if !message.text.isEmpty {
-                    MarkdownText(text: message.text, fontSize: ds.messageTextSize, isError: message.role == .error)
-                        .padding(.horizontal, ds.messageBubbleHorizontalPadding)
-                        .padding(.vertical, ds.messageBubbleVerticalPadding)
-                        .background(
-                            RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                                .fill(message.role == .ai ? Color(white: 0.12) : Color.clear)
-                                .overlay(
-                                    message.role == .ai
-                                        ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                                            .fill(providerColor.opacity(0.08))
-                                        : nil
-                                )
-                        )
-                        .background(
-                            message.role != .ai
-                                ? AnyShapeStyle(.ultraThinMaterial)
-                                : AnyShapeStyle(Color.clear),
-                            in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
-                        )
+                    Group {
+                        if message.role == .user {
+                            // Сообщения пользователя — компактный Text
+                            Text(message.text)
+                                .font(.system(size: ds.messageTextSize))
+                                .foregroundColor(.primary)
+                                .lineSpacing(0)
+                                .multilineTextAlignment(.trailing)
+                                .frame(minHeight: 0, alignment: .topLeading)
+                        } else {
+                            // Сообщения AI — MarkdownText
+                            MarkdownText(text: message.text, 
+                                         fontSize: ds.messageTextSize, 
+                                         isError: message.role == .error)
+                                .lineSpacing(2)
+                                .multilineTextAlignment(.leading)
+                                .frame(minHeight: 0, alignment: .topLeading)
+                        }
+                    }
+                    .padding(.horizontal, ds.messageBubbleHorizontalPadding)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                            .fill(message.role == .ai ? Color(white: 0.12) : Color.clear)
+                            .overlay(
+                                message.role == .ai
+                                    ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                                        .fill(providerColor.opacity(0.08))
+                                    : nil
+                            )
+                    )
+                    .background(
+                        message.role != .ai
+                            ? AnyShapeStyle(.ultraThinMaterial)
+                            : AnyShapeStyle(Color.clear),
+                        in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                    )
                 }
             }
-            if message.role != .user { Spacer(minLength: 60) }
+            
+            if message.role != .user {
+                Spacer(minLength: 60)
+            }
         }
     }
 }
-
 // MARK: - Image Picker
 struct AppImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
