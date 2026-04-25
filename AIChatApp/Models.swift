@@ -46,7 +46,12 @@ let ALL_PROVIDERS: [AIProvider] = [
         AIModel(id: "o3pro-labs",   name: "O3 Pro Labs",    badge: nil,     apiProvider: "g4f",     apiModel: "o3pro_labs"),
         AIModel(id: "o4mini",       name: "O4 Mini",        badge: "Fast",  apiProvider: "g4f",     apiModel: "o4mini"),
     ]),
+    
     AIProvider(id: "gemini", name: "Gemini", icon: "star.fill", colorHex: "#4285F4", models: [
+        AIModel(id: "gem-flash-lite-latest",      name: "Gemini Flash Lite Latest",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-flash-lite-latest"),
+        AIModel(id: "gem-flash-latest",      name: "Gemini Flash Latest",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-flash-latest"),
+        AIModel(id: "gem31-flash-lite-prev",      name: "Gemini 3.1 Flash Lite Preview",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-3.1-flash-lite-preview"),
+        AIModel(id: "gem3-flash-prev",      name: "Gemini 3 Flash Preview",      badge: nil,    apiProvider: "gemini", apiModel: "gemini-3-flash-preview"),
         AIModel(id: "gem25-flash",      name: "Gemini 2.5 Flash",         badge: nil,    apiProvider: "gemini", apiModel: "gemini-2.5-flash"),
         AIModel(id: "gem25-lite",       name: "Gemini 2.5 Flash Lite",    badge: "Lite", apiProvider: "gemini", apiModel: "gemini-2.5-flash-lite"),
     ]),
