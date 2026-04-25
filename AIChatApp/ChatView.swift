@@ -11,6 +11,8 @@ struct ChatView: View {
     @State private var inputText = ""
     @State private var chatId: String?
     @State private var isLoading = false
+    @State private var streamingText = ""
+    @State private var isStreaming = false
     @State private var selectedImages: [UIImage] = []
     @State private var showImagePicker = false
     @State private var thinkingMode = false
@@ -37,6 +39,14 @@ struct ChatView: View {
                                 MessageBubble(message: msg, providerColor: provider.color)
                                     .id(msg.id)
                             }
+                            // Streaming bubble
+                            if isStreaming && !streamingText.isEmpty {
+                                MessageBubble(
+                                    message: ChatMessage(role: .ai, text: streamingText),
+                                    providerColor: provider.color
+                                )
+                                .id("streaming")
+                            }
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 20)
@@ -48,10 +58,13 @@ struct ChatView: View {
                             }
                         }
                     }
+                    .onChange(of: streamingText) { _, _ in
+                        withAnimation { proxy.scrollTo("streaming", anchor: .bottom) }
+                    }
                 }
 
                 if isLoading {
-                    ThinkingAnimation(color: provider.color)
+                    WaveLoadingAnimation(color: provider.color)
                         .padding(.bottom, 12)
                 }
 
@@ -218,41 +231,60 @@ struct ChatView: View {
     }
 
     private func handleResponse(_ response: ChatResponse) {
-        if let text = response.text { messages.append(ChatMessage(role: .ai, text: text)) }
+        if let text = response.text {
+            if let id = response.resolvedChatId { chatId = id }
+            // Animate text word by word
+            let words = text.components(separatedBy: " ")
+            isStreaming = true
+            streamingText = ""
+            Task {
+                for (i, word) in words.enumerated() {
+                    try? await Task.sleep(nanoseconds: 30_000_000)
+                    streamingText += (i == 0 ? "" : " ") + word
+                }
+                // Commit to messages
+                messages.append(ChatMessage(role: .ai, text: text))
+                streamingText = ""
+                isStreaming = false
+            }
+        }
         if let id = response.resolvedChatId { chatId = id }
         if let error = response.error { messages.append(ChatMessage(role: .error, text: error)) }
     }
 }
 
-// MARK: - Thinking Animation
-struct ThinkingAnimation: View {
+// MARK: - Wave Loading Animation
+struct WaveLoadingAnimation: View {
     let color: Color
     @State private var phase: CGFloat = 0
+    private let barCount = 5
+    private let barWidth: CGFloat = 4
+    private let maxHeight: CGFloat = 22
+    private let minHeight: CGFloat = 5
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(0..<3) { index in
-                Circle().fill(color).frame(width: 8, height: 8)
-                    .scaleEffect(scale(for: index))
-                    .opacity(opacity(for: index))
+        HStack(spacing: 5) {
+            ForEach(0..<barCount, id: \.self) { i in
+                RoundedRectangle(cornerRadius: barWidth / 2)
+                    .fill(color)
+                    .frame(width: barWidth, height: barHeight(for: i))
+                    .animation(
+                        .easeInOut(duration: 0.5)
+                        .repeatForever(autoreverses: true)
+                        .delay(Double(i) * 0.1),
+                        value: phase
+                    )
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .background(.ultraThinMaterial, in: Capsule())
-        .onAppear {
-            withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
-                phase = 1
-            }
-        }
+        .onAppear { phase = 1 }
     }
 
-    private func scale(for index: Int) -> CGFloat {
-        let p = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
-        return 1 + sin(p * .pi) * 0.5
-    }
-    private func opacity(for index: Int) -> Double {
-        let p = (phase + CGFloat(index) * 0.33).truncatingRemainder(dividingBy: 1)
-        return 0.4 + sin(p * .pi) * 0.6
+    private func barHeight(for index: Int) -> CGFloat {
+        let offset = CGFloat(index) / CGFloat(barCount - 1)
+        let wave = sin((offset + phase) * .pi)
+        return minHeight + (maxHeight - minHeight) * ((wave + 1) / 2)
     }
 }
 
@@ -284,7 +316,12 @@ struct MessageBubble: View {
                         .foregroundStyle(message.role == .error ? .red : .white)
                         .padding(.horizontal, ds.messageBubbleHorizontalPadding)
                         .padding(.vertical, ds.messageBubbleVerticalPadding)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
+                        .background(
+                            message.role == .ai
+                                ? Color(white: 0.12)
+                                : .ultraThinMaterial,
+                            in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                        )
                 }
             }
             
