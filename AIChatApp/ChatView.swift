@@ -67,7 +67,7 @@ struct ChatView: View {
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
-                .controlSize(.large)
+                .controlSize(.regular)
             }
         }
         .navigationTitle(model.name)
