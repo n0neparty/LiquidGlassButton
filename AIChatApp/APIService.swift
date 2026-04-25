@@ -1,8 +1,7 @@
 import Foundation
 
-@MainActor
 final class APIService: Sendable {
-    nonisolated(unsafe) static let shared = APIService()
+    static let shared = APIService()
     private init() {}
 
     func sendMessage(model: AIModel, message: String, chatId: String?) async throws -> ChatResponse {
