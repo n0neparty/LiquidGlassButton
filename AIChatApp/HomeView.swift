@@ -86,36 +86,34 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
 
             Spacer()
 
             // Current model pill
             Button { showSettings = true } label: {
-                HStack(spacing: 6) {
+                HStack(spacing: 5) {
                     Image(systemName: selectedProvider.icon)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(selectedProvider.color)
                     Text(selectedModel.name)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
                     if let badge = selectedModel.badge {
                         Text(badge)
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(selectedProvider.color)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 3)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
                             .background(selectedProvider.color.opacity(0.2))
                             .clipShape(Capsule())
                     }
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: Capsule())
             }
-            .buttonStyle(.glass)
-            .clipShape(Capsule())
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
             Spacer()
@@ -126,9 +124,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -225,9 +222,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
             
             // Lightbulb button
             Button { } label: {
@@ -235,9 +231,8 @@ struct HomeView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
 
             // Text input
             ZStack {
@@ -263,9 +258,8 @@ struct HomeView: View {
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
+                        .background(.ultraThinMaterial, in: Circle())
                 }
-                .buttonStyle(.glass)
-                .clipShape(Circle())
                 .disabled(true)
             } else {
                 Button {

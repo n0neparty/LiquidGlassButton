@@ -75,18 +75,16 @@ struct ChatView: View {
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
             
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
             }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
             
             ZStack {
                 Capsule()
@@ -119,9 +117,8 @@ struct ChatView: View {
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
+                        .background(.ultraThinMaterial, in: Circle())
                 }
-                .buttonStyle(.glass)
-                .clipShape(Circle())
                 .disabled(true)
             } else {
                 Button { sendMessage() } label: {
@@ -181,17 +178,12 @@ struct MessageBubble: View {
                 Spacer(minLength: 60)
             }
             
-            Button { } label: {
-                Text(message.text)
-                    .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(message.role == .error ? .red : .white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.glass)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .disabled(true)
+            Text(message.text)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundStyle(message.role == .error ? .red : .white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             
             if message.role != .user {
                 Spacer(minLength: 60)

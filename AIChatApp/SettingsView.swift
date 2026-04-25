@@ -66,9 +66,8 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     }
-                                    .buttonStyle(.glass)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 }
                             }
                             .padding(.horizontal, 16)
@@ -122,9 +121,8 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
+                                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     }
-                                    .buttonStyle(.glass)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 }
                             }
                             .padding(.horizontal, 16)
