@@ -110,7 +110,8 @@ struct ChatView: View {
             .buttonStyle(.glass)
             .buttonBorderShape(.circle)
             
-            ZStack {
+            // Text input with send button overlay
+            ZStack(alignment: .trailing) {
                 Capsule()
                     .fill(.ultraThinMaterial)
                 
@@ -122,35 +123,36 @@ struct ChatView: View {
                     .submitLabel(.send)
                     .onSubmit { sendMessage() }
                     .padding(.leading, 18)
-                    .padding(.trailing, 50)
+                    .padding(.trailing, 48)
                     .padding(.vertical, 13)
+                
+                // Send button overlay
+                ZStack {
+                    if inputText.isEmpty {
+                        Button { } label: {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                                .foregroundStyle(.white)
+                                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                        }
+                        .buttonStyle(.glass)
+                        .buttonBorderShape(.circle)
+                        .disabled(true)
+                    } else {
+                        Button { sendMessage() } label: {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
+                                .foregroundStyle(.black)
+                                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                        }
+                        .buttonStyle(.plain)
+                        .background(Circle().fill(.white))
+                    }
+                }
+                .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
+                .padding(.trailing, 5)
             }
             .frame(height: 44)
-            
-            // Send button
-            ZStack {
-                if inputText.isEmpty {
-                    Button { } label: {
-                        Image(systemName: "arrow.up")
-                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                            .foregroundStyle(.white)
-                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                    }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
-                    .disabled(true)
-                } else {
-                    Button { sendMessage() } label: {
-                        Image(systemName: "arrow.up")
-                            .font(.system(size: debugSettings.buttonIconSize, weight: .bold))
-                            .foregroundStyle(.black)
-                            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
-                    }
-                    .buttonStyle(.plain)
-                    .background(Circle().fill(.white))
-                }
-            }
-            .frame(width: debugSettings.buttonSize, height: debugSettings.buttonSize)
         }
         .padding(.horizontal, debugSettings.inputBarHorizontalPadding)
         .padding(.vertical, debugSettings.inputBarVerticalPadding)
