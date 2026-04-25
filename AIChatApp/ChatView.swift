@@ -394,7 +394,7 @@ struct MarkdownText: View {
         let pattern = #"\\frac\{([^}]*)\}\{([^}]*)\}"#
         while let range = result.range(of: pattern, options: .regularExpression) {
             let match = String(result[range])
-            if lof: #"\{([^}]*)\}\{([^}]*)\}"#, options: .regularExpression) {
+            if let r = match.range(of: #"\{([^}]*)\}\{([^}]*)\}"#, options: .regularExpression) {
                 let inner = String(match[r]).dropFirst().dropLast()
                 let split = inner.components(separatedBy: "}{")
                 if split.count == 2 { result = result.replacingCharacters(in: range, with: "(\(split[0])/\(split[1]))"); continue }
@@ -405,23 +405,27 @@ struct MarkdownText: View {
     }
 
     private func replaceCmd(_ s: String, cmd: String, open o: String, close c: String) -> String {
-        gtry? NSRegularExpression(pattern: "\\\\\(cmd)\\{([^}]*)\\}") else { return s }
+        guard let re = try? NSRegularExpression(pattern: "\\\\\(cmd)\\{([^}]*)\\}") else { return s }
         return re.stringByReplacingMatches(in: s, range: NSRange(s.startIndex..., in: s), withTemplate: "\(o)$1\(c)")
     }
 
     private func replacePowers(_ s: String) -> String {
-        let sup: [Character: String] = [
-            "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
-            "n":"ⁿ","i":"ⁱ","a":"ᵃ","b":"ᵇ","c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ",
-            "h":"ʰ","j":"ʲ"ᵏ","l":"ˡ","m":"ᵐ","o":"ᵒ","p":"ᵖ","r":"ʳ","s":"ˢ",
-            "t":"ᵗ","u":"ᵘ","v":"ᵛ","w":"ʷ","x":"ˣ","y":"ʸ","z":"ᶻ","+":"⁺","-":"⁻"
+        let supMap: [String: String] = [
+            "0":"\u{2070}","1":"\u{00B9}","2":"\u{00B2}","3":"\u{00B3}","4":"\u{2074}",
+            "5":"\u{2075}","6":"\u{2076}","7":"\u{2077}","8":"\u{2078}","9":"\u{2079}",
+            "n":"\u{207F}","i":"\u{2071}","a":"\u{1D43}","b":"\u{1D47}","c":"\u{1D9C}",
+            "d":"\u{1D48}","e":"\u{1D49}","f":"\u{1DA0}","g":"\u{1D4D}","h":"\u{02B0}",
+            "j":"\u{02B2}","k":"\u{1D4F}","l":"\u{02E1}","m":"\u{1D50}","o":"\u{1D52}",
+            "p":"\u{1D56}","r":"\u{02B3}","s":"\u{02E2}","t":"\u{1D57}","u":"\u{1D58}",
+            "v":"\u{1D5B}","w":"\u{02B7}","x":"\u{02E3}","y":"\u{02B8}","z":"\u{1DBB}",
+            "+":"\u{207A}","-":"\u{207B}"
         ]
         var result = s
         if let re = try? NSRegularExpression(pattern: #"\^\{([^}]+)\}"#) {
             let matches = re.matches(in: result, range: NSRange(result.startIndex..., in: result))
             for m in matches.reversed() {
                 guard let r = Range(m.range, in: result), let gr = Range(m.range(at: 1), in: result) else { continue }
-                let mapped = result[gr].map { sup[$0] ?? String($0) }.joined()
+                let mapped = result[gr].map { supMap[String($0)] ?? String($0) }.joined()
                 result.replaceSubrange(r, with: mapped)
             }
         }
@@ -429,7 +433,7 @@ struct MarkdownText: View {
             let matches = re.matches(in: result, range: NSRange(result.startIndex..., in: result))
             for m in matches.reversed() {
                 guard let r = Range(m.range, in: result), let gr = Range(m.range(at: 1), in: result) else { continue }
-          = sup[result[gr].first!] ?? String(result[gr])
+                let mapped = supMap[String(result[gr])] ?? String(result[gr])
                 result.replaceSubrange(r, with: mapped)
             }
         }
@@ -437,17 +441,20 @@ struct MarkdownText: View {
     }
 
     private func replaceSubs(_ s: String) -> String {
-        let sub: [Character: String] = [
-            "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉",
-            "a":"ₐ","e":"ₑ","o":"ₒ","x":"ₓ","n":"ₙ","i":"ᵢ","j":"ⱼ","k":"ₖ","l":"ₗ",
-            "m":"ₘ","p""
+        let subMap: [String: String] = [
+            "0":"\u{2080}","1":"\u{2081}","2":"\u{2082}","3":"\u{2083}","4":"\u{2084}",
+            "5":"\u{2085}","6":"\u{2086}","7":"\u{2087}","8":"\u{2088}","9":"\u{2089}",
+            "a":"\u{2090}","e":"\u{2091}","o":"\u{2092}","x":"\u{2093}","n":"\u{2099}",
+            "i":"\u{1D62}","j":"\u{2C7C}","k":"\u{2096}","l":"\u{2097}","m":"\u{2098}",
+            "p":"\u{209A}","r":"\u{1D63}","s":"\u{209B}","t":"\u{209C}","u":"\u{1D64}",
+            "v":"\u{1D65}","+":"\u{208A}","-":"\u{208B}"
         ]
         var result = s
         if let re = try? NSRegularExpression(pattern: #"_\{([^}]+)\}"#) {
             let matches = re.matches(in: result, range: NSRange(result.startIndex..., in: result))
             for m in matches.reversed() {
                 guard let r = Range(m.range, in: result), let gr = Range(m.range(at: 1), in: result) else { continue }
-                let mapped = result[gr].map { sub[$0] ?? String($0) }.joined()
+                let mapped = result[gr].map { subMap[String($0)] ?? String($0) }.joined()
                 result.replaceSubrange(r, with: mapped)
             }
         }
@@ -455,7 +462,7 @@ struct MarkdownText: View {
             let matches = re.matches(in: result, range: NSRange(result.startIndex..., in: result))
             for m in matches.reversed() {
                 guard let r = Range(m.range, in: result), let gr = Range(m.range(at: 1), in: result) else { continue }
-                let mapped = sub[result[gr].first!] ?? String(result[gr])
+                let mapped = subMap[String(result[gr])] ?? String(result[gr])
                 result.replaceSubrange(r, with: mapped)
             }
         }
