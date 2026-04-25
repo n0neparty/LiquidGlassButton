@@ -73,70 +73,62 @@ struct ChatView: View {
             Button { } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background {
-                        ZStack {
-                            Circle().fill(Color.white.opacity(0.15))
-                            Circle().fill(.ultraThinMaterial)
-                        }
-                    }
             }
+            .buttonStyle(.glass)
             
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background {
-                        ZStack {
-                            Circle().fill(Color.white.opacity(0.15))
-                            Circle().fill(.ultraThinMaterial)
-                        }
-                    }
             }
+            .buttonStyle(.glass)
             
-            TextField("Ask anything", text: $inputText)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(.white)
-                .tint(provider.color)
-                .focused($inputFocused)
-                .submitLabel(.send)
-                .onSubmit { sendMessage() }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 13)
-                .background {
-                    ZStack {
-                        Capsule().fill(Color.white.opacity(0.15))
-                        Capsule().fill(.ultraThinMaterial)
-                    }
-                }
+            ZStack {
+                Capsule()
+                    .fill(.ultraThinMaterial)
+                
+                TextField("Ask anything", text: $inputText)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.white)
+                    .tint(provider.color)
+                    .focused($inputFocused)
+                    .submitLabel(.send)
+                    .onSubmit { sendMessage() }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 13)
+            }
+            .frame(height: 44)
             
-            Button { sendMessage() } label: {
-                if isLoading {
+            // Send button - полностью белая когда активна
+            if isLoading {
+                Button { } label: {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .black))
                         .frame(width: 44, height: 44)
                         .background(Circle().fill(.white))
-                } else {
+                }
+                .disabled(true)
+            } else if inputText.isEmpty {
+                Button { } label: {
                     Image(systemName: "arrow.up")
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(inputText.isEmpty ? .white.opacity(0.4) : .black)
+                        .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
-                        .background {
-                            if inputText.isEmpty {
-                                ZStack {
-                                    Circle().fill(Color.white.opacity(0.15))
-                                    Circle().fill(.ultraThinMaterial)
-                                }
-                            } else {
-                                Circle().fill(.white)
-                            }
-                        }
+                }
+                .buttonStyle(.glass)
+                .disabled(true)
+            } else {
+                Button { sendMessage() } label: {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.black)
+                        .frame(width: 44, height: 44)
+                        .background(Circle().fill(.white))
                 }
             }
-            .disabled(inputText.isEmpty || isLoading)
-            .animation(.spring(response: 0.35, dampingFraction: 0.7), value: inputText.isEmpty)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -186,19 +178,16 @@ struct MessageBubble: View {
                 Spacer(minLength: 60)
             }
             
-            Text(message.text)
-                .font(.system(size: 15, weight: .regular))
-                .foregroundStyle(message.role == .error ? .red : .white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(Color.white.opacity(0.15))
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                    }
-                }
+            Button { } label: {
+                Text(message.text)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(message.role == .error ? .red : .white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.glass)
+            .disabled(true)
             
             if message.role != .user {
                 Spacer(minLength: 60)

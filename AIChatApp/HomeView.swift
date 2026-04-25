@@ -68,40 +68,30 @@ struct HomeView: View {
         }
     }
 
-    // MARK: Top Bar (Header)
+    // MARK: Top Bar (Header) с настоящим liquid glass
     var topBar: some View {
         HStack(spacing: 12) {
-            // Settings button - круглая с системным liquid glass
+            // Settings button
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.85))
+                    .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background {
-                        ZStack {
-                            Circle().fill(Color.white.opacity(0.15))
-                            Circle().fill(.ultraThinMaterial)
-                        }
-                    }
             }
+            .buttonStyle(.glass)
 
-            // History button - круглая с системным liquid glass
+            // History button
             Button { } label: {
                 Image(systemName: "bubble.left.fill")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.85))
+                    .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background {
-                        ZStack {
-                            Circle().fill(Color.white.opacity(0.15))
-                            Circle().fill(.ultraThinMaterial)
-                        }
-                    }
             }
+            .buttonStyle(.glass)
 
             Spacer()
 
-            // Current model pill с системным liquid glass
+            // Current model pill
             Button { showSettings = true } label: {
                 HStack(spacing: 6) {
                     Image(systemName: selectedProvider.icon)
@@ -122,30 +112,20 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background {
-                    ZStack {
-                        Capsule().fill(Color.white.opacity(0.15))
-                        Capsule().fill(.ultraThinMaterial)
-                    }
-                }
             }
+            .buttonStyle(.glass)
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selectedModel.id)
 
             Spacer()
 
-            // New chat button - круглая с системным liquid glass
+            // New chat button
             Button { inputText = ""; navigateToChat = true } label: {
                 Image(systemName: "square.and.pencil")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.85))
+                    .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background {
-                        ZStack {
-                            Circle().fill(Color.white.opacity(0.15))
-                            Circle().fill(.ultraThinMaterial)
-                        }
-                    }
             }
+            .buttonStyle(.glass)
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -166,25 +146,21 @@ struct HomeView: View {
                 .lineSpacing(4)
                 .padding(.horizontal, 40)
             
-            // Loading indicator с системным liquid glass
-            HStack(spacing: 8) {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white.opacity(0.6)))
-                    .scaleEffect(0.8)
-                Text("Loading model...")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.4))
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .background {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Color.white.opacity(0.15))
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(.ultraThinMaterial)
+            // Loading indicator с настоящим liquid glass
+            Button { } label: {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white.opacity(0.6)))
+                        .scaleEffect(0.8)
+                    Text("Loading model...")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.6))
                 }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
             }
+            .buttonStyle(.glass)
+            .disabled(true)
             .padding(.top, 20)
         }
         .padding(.horizontal, 32)
@@ -207,7 +183,7 @@ struct HomeView: View {
         .padding(.horizontal, 32)
     }
 
-    // MARK: Suggestion Chips (Action Cards) с системным liquid glass
+    // MARK: Suggestion Chips (Action Cards) с настоящим liquid glass
     var suggestionChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -226,15 +202,8 @@ struct HomeView: View {
                         }
                         .frame(width: 160, alignment: .leading)
                         .padding(16)
-                        .background {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .fill(Color.white.opacity(0.15))
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .fill(.ultraThinMaterial)
-                            }
-                        }
                     }
+                    .buttonStyle(.glass)
                 }
             }
             .padding(.horizontal, 16)
@@ -249,31 +218,36 @@ struct HomeView: View {
             Button { } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
             }
+            .buttonStyle(.glass)
             
             // Lightbulb button
             Button { } label: {
                 Image(systemName: "lightbulb.fill")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
             }
+            .buttonStyle(.glass)
 
             // Text input
-            TextField("Ask anything", text: $inputText)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundStyle(.white)
-                .tint(selectedProvider.color)
-                .focused($inputFocused)
-                .submitLabel(.send)
-                .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 13)
-                .background(.ultraThinMaterial, in: Capsule())
+            ZStack {
+                Capsule()
+                    .fill(.ultraThinMaterial)
+                
+                TextField("Ask anything", text: $inputText)
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.white)
+                    .tint(selectedProvider.color)
+                    .focused($inputFocused)
+                    .submitLabel(.send)
+                    .onSubmit { if !inputText.isEmpty { navigateToChat = true } }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 13)
+            }
+            .frame(height: 44)
 
             // Send button - полностью белая
             Button {

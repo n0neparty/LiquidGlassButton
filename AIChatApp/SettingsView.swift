@@ -66,15 +66,8 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 14)
-                                        .background {
-                                            ZStack {
-                                                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                                    .fill(Color.white.opacity(0.15))
-                                                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                                    .fill(.ultraThinMaterial)
-                                            }
-                                        }
                                     }
+                                    .buttonStyle(.glassProminent)
                                 }
                             }
                             .padding(.horizontal, 16)
@@ -128,15 +121,8 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 14)
-                                        .background {
-                                            ZStack {
-                                                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                                    .fill(Color.white.opacity(0.15))
-                                                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                                    .fill(.ultraThinMaterial)
-                                            }
-                                        }
                                     }
+                                    .buttonStyle(.glassProminent)
                                 }
                             }
                             .padding(.horizontal, 16)
