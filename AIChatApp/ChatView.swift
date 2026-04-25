@@ -396,7 +396,7 @@ struct MarkdownText: View {
 
     @ViewBuilder
     private func inlineText(_ raw: String) -> some View {
-        if let attr = try? AttributedString(markdown: raw, options: .init(interpretedSyntax: .inlinesOnlyPreservingWhitespace)) {
+        if let attr = try? AttributedString(markdown: raw, options: .init(interpretedSyntax: .inlinesOnly)) {
             Text(attr)
                 .font(.system(size: fontSize, weight: .regular))
                 .foregroundStyle(isError ? .red : .white)
