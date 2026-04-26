@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 
 struct ChatView: View {
     let provider: AIProvider
@@ -213,20 +214,27 @@ struct ChatView: View {
                     )
                 }
 
-                // Сильная инструкция для нейросети, чтобы она всегда использовала правильный LaTeX
-                let mathPrompt = """
-                Всегда используй правильный KaTeX / LaTeX синтаксис для математики:
-                - Inline: \\( формула \\)
-                - Блок: \\[ формула \\] или $$ формула $$
-                Для углов: \\angle, для треугольника: \\triangle, для градусов: ^\\circ
-                Пример: \\angle BDT = 80^\\circ
-                """
+                let isMathRelated = userMsg.lowercased().contains("угол") || 
+                                   userMsg.lowercased().contains("треугольник") ||
+                                   userMsg.lowercased().contains("формул") ||
+                                   userMsg.lowercased().contains("математик") ||
+                                   userMsg.lowercased().contains("геометр") ||
+                                   userMsg.lowercased().contains("физик") ||
+                                   userMsg.contains("°") || userMsg.contains("\\(")
+
+                let finalMessage = isMathRelated 
+                    ? """
+                    Всегда используй KaTeX синтаксис:
+                    - Inline формулы: \\( ... \\)
+                    - Блочные формулы: \\[ ... \\] или $$ ... $$
+                    Для углов: \\angle, для треугольника: \\triangle, градусы: ^\\circ
+                    
+                    Вопрос: \(userMsg)
+                    """
+                    : userMsg
 
                 let response = try await APIService.shared.sendMessage(
-                    model: model,
-                    message: mathPrompt + "\n\n" + userMsg,
-                    chatId: chatId,
-                    image: img
+                    model: model, message: finalMessage, chatId: chatId, image: img
                 )
                 
                 if let id = response.resolvedChatId { chatId = id }
@@ -246,17 +254,17 @@ struct ChatView: View {
 
     private func cleanThinkingTags(_ text: String) -> String {
         var result = text
-        if let endRange = result.range(of: "</think>", options: .caseInsensitive) {
-            result = String(result[endRange.upperBound...])
+        if let end = result.range(of: "</think>", options: .caseInsensitive) {
+            result = String(result[end.upperBound...])
         }
-        result = result
+        return result
             .replacingOccurrences(of: "1337", with: "")
             .replacingOccurrences(of: "-----", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let lines = result.components(separatedBy: .newlines)
-        let cleanedLines = lines.drop(while: { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
-        return cleanedLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+            .components(separatedBy: .newlines)
+            .drop(while: { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+            .joined(separator: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     @MainActor
@@ -283,13 +291,9 @@ struct MessageBubble: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            if message.role == .user {
-                Spacer(minLength: 60)
-            } else {
-                Spacer(minLength: 12)
-            }
+            if message.role == .user { Spacer(minLength: 60) } else { Spacer(minLength: 12) }
             
-            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 6) {
+            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 8) {
                 if let image = message.image {
                     Image(uiImage: image)
                         .resizable().scaledToFill()
@@ -305,48 +309,33 @@ struct MessageBubble: View {
                                 .foregroundColor(.primary)
                                 .multilineTextAlignment(.trailing)
                         } else {
-                            MathMarkdownText(text: message.text, fontSize: ds.messageTextSize)
-                                .multilineTextAlignment(.leading)
+                            KaTeXMarkdownText(text: message.text, fontSize: ds.messageTextSize)
                         }
                     }
                     .padding(.horizontal, 14)
                     .padding(.vertical, 11)
-                    .background(
-                        message.role == .ai 
-                        ? Color(white: 0.14).cornerRadius(14)
-                        : Color.clear
-                    )
+                    .background(message.role == .ai ? Color(white: 0.14).cornerRadius(14) : Color.clear)
                 }
             }
-            .frame(maxWidth: message.role == .ai ? 350 : .infinity, 
-                   alignment: message.role == .user ? .trailing : .leading)
+            .frame(maxWidth: message.role == .ai ? 350 : .infinity, alignment: message.role == .user ? .trailing : .leading)
             
-            if message.role == .user {
-                Spacer(minLength: 12)
-            } else {
-                Spacer(minLength: 60)
-            }
+            if message.role == .user { Spacer(minLength: 12) } else { Spacer(minLength: 60) }
         }
         .padding(.horizontal, 8)
     }
 }
 
-// MARK: - Улучшенный рендер математики (обрабатывает почти всё)
-struct MathMarkdownText: View {
+// MARK: - KaTeX WebView (лучший рендер математики)
+struct KaTeXMarkdownText: View {
     let text: String
     let fontSize: CGFloat
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(parseMathBlocks(text), id: \.self) { part in
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(splitIntoMathAndText(text), id: \.self) { part in
                 if part.isMath {
-                    Text(part.content)
-                        .font(.system(size: fontSize + 2, design: .monospaced))
-                        .foregroundColor(.cyan)
-                        .padding(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white.opacity(0.085))
-                        .cornerRadius(10)
+                    KaTeXView(latex: part.content, fontSize: fontSize + 2)
+                        .frame(minHeight: 40)
                 } else {
                     Text(part.content)
                         .font(.system(size: fontSize))
@@ -357,42 +346,26 @@ struct MathMarkdownText: View {
         }
     }
 
-    private func parseMathBlocks(_ input: String) -> [MathPart] {
+    private func splitIntoMathAndText(_ input: String) -> [MathPart] {
         var parts: [MathPart] = []
-        var remaining = input
+        let lines = input.components(separatedBy: .newlines)
         
-        let regexPatterns = [
-            #"\\\[(.*?)\\\]"#,      // \[ ... \]
-            #"\$\$(.*?)\$\$"#,      // $$ ... $$
-            #"\\\((.*?)\\\)"#       // \( ... \)
-        ]
-        
-        while !remaining.isEmpty {
-            var matched = false
-            for pattern in regexPatterns {
-                if let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]),
-                   let match = regex.firstMatch(in: remaining, range: NSRange(remaining.startIndex..., in: remaining)) {
-                    
-                    let beforeRange = NSRange(location: 0, length: match.range.location)
-                    if let before = Range(beforeRange, in: remaining), !before.isEmpty {
-                        parts.append(MathPart(content: String(remaining[before]).trimmingCharacters(in: .whitespacesAndNewlines), isMath: false))
-                    }
-                    
-                    let mathRange = Range(match.range(at: 1), in: remaining)!
-                    let mathContent = String(remaining[mathRange]).trimmingCharacters(in: .whitespacesAndNewlines)
-                    parts.append(MathPart(content: mathContent, isMath: true))
-                    
-                    remaining = String(remaining[Range(match.range.upperBound..., in: remaining)!])
-                    matched = true
-                    break
-                }
-            }
-            if !matched {
-                parts.append(MathPart(content: remaining, isMath: false))
-                break
+        for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            guard !trimmed.isEmpty else { continue }
+            
+            if isMathContent(trimmed) {
+                parts.append(MathPart(content: trimmed, isMath: true))
+            } else {
+                parts.append(MathPart(content: line, isMath: false))
             }
         }
         return parts
+    }
+
+    private func isMathContent(_ text: String) -> Bool {
+        let indicators = ["\\(", "\\)", "\\[", "\\]", "$$", "\\angle", "\\triangle", "^\\circ", "\\frac", "\\sqrt", "°", "△", "∠", "="]
+        return indicators.contains { text.contains($0) }
     }
 }
 
@@ -401,7 +374,57 @@ struct MathPart: Hashable {
     let isMath: Bool
 }
 
-// MARK: - WaveLoadingAnimation, AppImagePicker (оставлены как были)
+// MARK: - WKWebView с KaTeX
+struct KaTeXView: UIViewRepresentable {
+    let latex: String
+    let fontSize: CGFloat
+
+    func makeUIView(context: Context) -> WKWebView {
+        let webView = WKWebView()
+        webView.backgroundColor = .clear
+        webView.isOpaque = false
+        webView.scrollView.isScrollEnabled = false
+        webView.scrollView.bounces = false
+        
+        let html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+            <style>
+                body { margin: 0; padding: 8px 0; background: transparent; color: #ffffff; font-size: \(fontSize)px; }
+                .katex { font-size: 1.1em; }
+                .katex-display { margin: 12px 0; }
+            </style>
+        </head>
+        <body>
+            <div id="math"></div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    try {
+                        katex.render(`\(latex)`, document.getElementById('math'), {
+                            throwOnError: false,
+                            displayMode: true
+                        });
+                    } catch(e) {
+                        document.getElementById('math').innerHTML = '<span style="color: #ff6b6b;">' + e.message + '</span>';
+                    }
+                });
+            </script>
+        </body>
+        </html>
+        """
+        
+        webView.loadHTMLString(html, baseURL: nil)
+        return webView
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {}
+}
+
+// MARK: - Остальные компоненты
 struct WaveLoadingAnimation: View {
     let color: Color
     @State private var animating = false
