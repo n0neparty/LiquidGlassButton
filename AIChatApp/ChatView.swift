@@ -1,5 +1,4 @@
 import SwiftUI
-import WebKit
 
 struct ChatView: View {
     let provider: AIProvider
@@ -76,8 +75,11 @@ struct ChatView: View {
                             .id(msg.id)
                     }
                     if isStreaming && !streamingText.isEmpty {
-                        MessageBubble(message: ChatMessage(role: .ai, text: streamingText), providerColor: provider.color)
-                            .id("streaming")
+                        MessageBubble(
+                            message: ChatMessage(role: .ai, text: streamingText),
+                            providerColor: provider.color
+                        )
+                        .id("streaming")
                     }
                 }
                 .padding(.horizontal, 16)
@@ -97,6 +99,7 @@ struct ChatView: View {
     }
 
     var inputBar: some View {
+        // ... (inputBar без изменений, как в предыдущей версии)
         VStack(spacing: 0) {
             if !selectedImages.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -214,14 +217,25 @@ struct ChatView: View {
                     )
                 }
 
-                let isMathRelated = ["угол", "треугольник", "формул", "математик", "геометр", "физик", "°", "\\("].contains { userMsg.lowercased().contains($0) }
+                // Главная инструкция для отличного математического форматирования
+                let mathPrompt = """
+                Ты — эксперт по математике, физике и геометрии. 
+                Для **всех** формул, символов, треугольников, углов, дробей, корней, интегралов, сумм, матриц и т.д. используй KaTeX / LaTeX синтаксис:
+                - Inline: \\( формула \\)
+                - Блок: \\[ формула \\] или $$ формула $$
+                Используй специальные символы: △ (треугольник), ∠ (угол), ° (градус), √, ∛, ∞, ∑, ∏, ∫, ≠, ≈, ≤, ≥, ⊂, ∪, ∩ и т.д.
+                Делай ответы максимально красивыми и читаемыми.
+                """
 
-                let finalMessage = isMathRelated 
-                    ? "Используй KaTeX: \\( ... \\) для inline, \\[ ... \\] для блоков. \\angle для углов, \\triangle для треугольника.\n\n\(userMsg)"
-                    : userMsg
+                let fullMessage = userMsg.contains("математик") || userMsg.contains("формул") || userMsg.contains("треугольник") 
+                    ? userMsg 
+                    : "\(mathPrompt)\n\nВопрос пользователя: \(userMsg)"
 
                 let response = try await APIService.shared.sendMessage(
-                    model: model, message: finalMessage, chatId: chatId, image: img
+                    model: model, 
+                    message: fullMessage, 
+                    chatId: chatId, 
+                    image: img
                 )
                 
                 if let id = response.resolvedChatId { chatId = id }
@@ -229,8 +243,8 @@ struct ChatView: View {
                 if let err = response.error {
                     messages.append(ChatMessage(role: .error, text: err))
                 } else if let text = response.text {
-                    let cleaned = cleanThinkingTags(text)
-                    await streamWords(cleaned)
+                    let cleanedText = cleanThinkingTags(text)
+                    await streamWords(cleanedText)
                 }
             } catch {
                 messages.append(ChatMessage(role: .error, text: error.localizedDescription))
@@ -241,153 +255,42 @@ struct ChatView: View {
 
     private func cleanThinkingTags(_ text: String) -> String {
         var result = text
-        if let end = result.range(of: "</think>", options: .caseInsensitive) {
-            result = String(result[end.upperBound...])
+        
+        if let thinkEndRange = result.range(of: "</think>", options: .caseInsensitive) {
+            result = String(result[thinkEndRange.upperBound...])
         }
-        return result
+        
+        result = result
             .replacingOccurrences(of: "1337", with: "")
             .replacingOccurrences(of: "-----", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        let lines = result.components(separatedBy: .newlines)
+        let cleanedLines = lines.drop(while: { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+        
+        return cleanedLines.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     @MainActor
     private func streamWords(_ text: String) async {
         guard !text.isEmpty else { return }
+        
         let words = text.components(separatedBy: " ")
         isStreaming = true
         streamingText = ""
+        
         for (i, word) in words.enumerated() {
             try? await Task.sleep(nanoseconds: 25_000_000)
             streamingText += (i == 0 ? "" : " ") + word
         }
+        
         messages.append(ChatMessage(role: .ai, text: text))
         streamingText = ""
         isStreaming = false
     }
 }
 
-// MARK: - Message Bubble
-struct MessageBubble: View {
-    let message: ChatMessage
-    let providerColor: Color
-    var ds: DebugSettings { DebugSettings.shared }
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 0) {
-            if message.role == .user { Spacer(minLength: 60) } else { Spacer(minLength: 12) }
-            
-            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 8) {
-                if let image = message.image {
-                    Image(uiImage: image)
-                        .resizable().scaledToFill()
-                        .frame(width: 180, height: 180)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                
-                if !message.text.isEmpty {
-                    Group {
-                        if message.role == .user {
-                            Text(message.text)
-                                .font(.system(size: ds.messageTextSize))
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.trailing)
-                        } else {
-                            KaTeXMarkdownText(text: message.text)
-                        }
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 11)
-                    .background(message.role == .ai ? Color(white: 0.14).cornerRadius(14) : Color.clear)
-                }
-            }
-            .frame(maxWidth: message.role == .ai ? 350 : .infinity, alignment: message.role == .user ? .trailing : .leading)
-            
-            if message.role == .user { Spacer(minLength: 12) } else { Spacer(minLength: 60) }
-        }
-        .padding(.horizontal, 8)
-    }
-}
-
-// MARK: - KaTeX Markdown
-struct KaTeXMarkdownText: View {
-    let text: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(splitContent(text), id: \.self) { part in
-                if part.isMath {
-                    KaTeXView(latex: part.content)
-                } else {
-                    Text(part.content)
-                        .font(.system(size: 17))
-                        .foregroundColor(.white)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
-    }
-
-    private func splitContent(_ input: String) -> [ContentPart] {
-        input.components(separatedBy: .newlines).map { line in
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-            let isMath = trimmed.contains("\\(") || trimmed.contains("\\[") || 
-                        trimmed.contains("$$") || trimmed.contains("\\angle") || 
-                        trimmed.contains("\\triangle") || trimmed.contains("^\\circ")
-            return ContentPart(content: line, isMath: isMath && !trimmed.isEmpty)
-        }
-    }
-}
-
-struct ContentPart: Hashable {
-    let content: String
-    let isMath: Bool
-}
-
-// MARK: - KaTeX WebView
-struct KaTeXView: UIViewRepresentable {
-    let latex: String
-
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        webView.backgroundColor = .clear
-        webView.isOpaque = false
-        webView.scrollView.isScrollEnabled = false
-        webView.scrollView.bounces = false
-
-        let safeLatex = latex.replacingOccurrences(of: "`", with: "\\`")
-        
-        let html = """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-            <style>
-                body { margin: 0; padding: 8px 0; background: transparent; color: white; }
-                .katex { font-size: 1.05em; }
-            </style>
-        </head>
-        <body>
-            <div id="math"></div>
-            <script>
-                katex.render(`\(safeLatex)`, document.getElementById('math'), {
-                    throwOnError: false,
-                    displayMode: true
-                });
-            </script>
-        </body>
-        </html>
-        """
-        
-        webView.loadHTMLString(html, baseURL: nil)
-        return webView
-    }
-
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
-}
-
-// MARK: - WaveLoadingAnimation
+// MARK: - Wave Loading Animation (без изменений)
 struct WaveLoadingAnimation: View {
     let color: Color
     @State private var animating = false
@@ -411,7 +314,188 @@ struct WaveLoadingAnimation: View {
     }
 }
 
-// MARK: - AppImagePicker
+// MARK: - Message Bubble (тёмный фон + улучшенная ширина)
+struct MessageBubble: View {
+    let message: ChatMessage
+    let providerColor: Color
+    var ds: DebugSettings { DebugSettings.shared }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 0) {
+            if message.role == .user {
+                Spacer(minLength: 60)
+            } else {
+                Spacer(minLength: 12)
+            }
+            
+            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
+                if let image = message.image {
+                    Image(uiImage: image)
+                        .resizable().scaledToFill()
+                        .frame(width: 180, height: 180)
+                        .clipShape(RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous))
+                }
+                
+                if !message.text.isEmpty {
+                    Group {
+                        if message.role == .user {
+                            Text(message.text)
+                                .font(.system(size: ds.messageTextSize))
+                                .foregroundColor(.primary)
+                                .lineSpacing(0)
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            EnhancedMarkdownText(text: message.text, 
+                                               fontSize: ds.messageTextSize, 
+                                               isError: message.role == .error)
+                                .lineSpacing(2)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
+                    .padding(.horizontal, ds.messageBubbleHorizontalPadding)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                            .fill(message.role == .ai ? Color(white: 0.15) : Color.clear)
+                            .overlay(message.role == .ai ? RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius).fill(providerColor.opacity(0.08)) : nil)
+                    )
+                    .background(
+                        message.role != .ai ? AnyShapeStyle(.ultraThinMaterial) : AnyShapeStyle(Color.clear),
+                        in: RoundedRectangle(cornerRadius: ds.messageBubbleCornerRadius, style: .continuous)
+                    )
+                    .frame(maxWidth: message.role == .ai ? 340 : .infinity, 
+                           alignment: message.role == .user ? .trailing : .leading)
+                }
+            }
+            
+            if message.role == .user {
+                Spacer(minLength: 12)
+            } else {
+                Spacer(minLength: 60)
+            }
+        }
+        .padding(.horizontal, 8)
+    }
+}
+
+// MARK: - Улучшенный рендер с поддержкой математики (треугольники, углы, дроби и т.д.)
+struct EnhancedMarkdownText: View {
+    let text: String
+    let fontSize: CGFloat
+    let isError: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(parseBlocks(text).enumerated()), id: \.offset) { _, block in
+                blockView(block)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func blockView(_ block: MDBlock) -> some View {
+        switch block {
+        case .h1(let t): headerText(t, size: fontSize + 8, weight: .bold)
+        case .h2(let t): headerText(t, size: fontSize + 5, weight: .bold)
+        case .h3(let t): headerText(t, size: fontSize + 2, weight: .semibold)
+        case .bullet(let t):
+            HStack(alignment: .top, spacing: 8) {
+                Text("•").font(.system(size: fontSize)).foregroundStyle(.white.opacity(0.7))
+                mathAwareText(t)
+            }
+        case .code(let t):
+            Text(t)
+                .font(.system(size: fontSize - 1, design: .monospaced))
+                .foregroundStyle(.green.opacity(0.9))
+                .padding(10)
+                .background(Color.white.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        case .paragraph(let t):
+            mathAwareText(t)
+        case .divider:
+            Divider().background(Color.white.opacity(0.2))
+        }
+    }
+
+    private func headerText(_ content: String, size: CGFloat, weight: Font.Weight) -> some View {
+        Text(content)
+            .font(.system(size: size, weight: weight))
+            .foregroundStyle(isError ? .red : .white)
+    }
+
+    @ViewBuilder
+    private func mathAwareText(_ raw: String) -> some View {
+        let trimmed = raw.trimmingCharacters(in: .whitespaces)
+        
+        if isMathExpression(trimmed) {
+            Text(trimmed)
+                .font(.system(size: fontSize + 1, design: .monospaced))
+                .foregroundStyle(.cyan)
+                .padding(8)
+                .background(Color.white.opacity(0.07))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+        } else if let attr = try? AttributedString(markdown: raw) {
+            Text(attr)
+                .font(.system(size: fontSize))
+                .foregroundStyle(isError ? .red : .white)
+                .tint(.cyan)
+        } else {
+            Text(raw)
+                .font(.system(size: fontSize))
+                .foregroundStyle(isError ? .red : .white)
+        }
+    }
+
+    private func isMathExpression(_ text: String) -> Bool {
+        let indicators = ["\\(", "\\)", "\\[", "\\]", "$$", "\\frac", "\\sqrt", "\\int", "\\sum", "\\prod", "\\Delta", "\\angle", "△", "∠", "°", "^", "_", "≠", "≈"]
+        return indicators.contains { text.contains($0) } ||
+               (text.contains("=") && (text.contains("^") || text.contains("\\") || text.contains("△") || text.contains("∠")))
+    }
+
+    private func parseBlocks(_ input: String) -> [MDBlock] {
+        let lines = input.components(separatedBy: "\n")
+        var blocks: [MDBlock] = []
+        var codeBuffer: [String] = []
+        var inCode = false
+
+        for line in lines {
+            if line.hasPrefix("```") {
+                if inCode {
+                    blocks.append(.code(codeBuffer.joined(separator: "\n")))
+                    codeBuffer = []
+                    inCode = false
+                } else {
+                    inCode = true
+                }
+                continue
+            }
+            if inCode {
+                codeBuffer.append(line)
+                continue
+            }
+
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("### ") { blocks.append(.h3(String(line.dropFirst(4)))) }
+            else if trimmed.hasPrefix("## ") { blocks.append(.h2(String(line.dropFirst(3)))) }
+            else if trimmed.hasPrefix("# ") { blocks.append(.h1(String(line.dropFirst(2)))) }
+            else if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") { blocks.append(.bullet(String(line.dropFirst(2)))) }
+            else if trimmed == "---" || trimmed == "***" { blocks.append(.divider) }
+            else if !trimmed.isEmpty { blocks.append(.paragraph(line)) }
+        }
+        return blocks
+    }
+}
+
+enum MDBlock {
+    case h1(String), h2(String), h3(String)
+    case bullet(String)
+    case code(String)
+    case paragraph(String)
+    case divider
+}
+
+// MARK: - AppImagePicker и остальные структуры (оставлены без изменений)
 struct AppImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
     @Environment(\.dismiss) var dismiss
