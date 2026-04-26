@@ -214,16 +214,10 @@ struct ChatView: View {
                     )
                 }
 
-                let isMathRelated = userMsg.lowercased().contains("угол") || 
-                                   userMsg.lowercased().contains("треугольник") ||
-                                   userMsg.lowercased().contains("формул") ||
-                                   userMsg.lowercased().contains("математик") ||
-                                   userMsg.lowercased().contains("геометр") ||
-                                   userMsg.lowercased().contains("физик") ||
-                                   userMsg.contains("°") || userMsg.contains("\\(")
+                let isMathRelated = ["угол", "треугольник", "формул", "математик", "геометр", "физик", "°", "\\("].contains { userMsg.lowercased().contains($0) }
 
                 let finalMessage = isMathRelated 
-                    ? "Используй KaTeX: inline \\( ... \\), блок \\[ ... \\] или $$. \\angle для углов, \\triangle для треугольника.\n\n\(userMsg)"
+                    ? "Используй KaTeX: \\( ... \\) для inline, \\[ ... \\] для блоков. \\angle для углов, \\triangle для треугольника.\n\n\(userMsg)"
                     : userMsg
 
                 let response = try await APIService.shared.sendMessage(
@@ -314,7 +308,7 @@ struct MessageBubble: View {
     }
 }
 
-// MARK: - KaTeX Markdown Renderer
+// MARK: - KaTeX Markdown
 struct KaTeXMarkdownText: View {
     let text: String
 
@@ -334,13 +328,12 @@ struct KaTeXMarkdownText: View {
     }
 
     private func splitContent(_ input: String) -> [ContentPart] {
-        let lines = input.components(separatedBy: .newlines)
-        return lines.map { line in
+        input.components(separatedBy: .newlines).map { line in
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             let isMath = trimmed.contains("\\(") || trimmed.contains("\\[") || 
                         trimmed.contains("$$") || trimmed.contains("\\angle") || 
                         trimmed.contains("\\triangle") || trimmed.contains("^\\circ")
-            return ContentPart(content: line, isMath: isMath)
+            return ContentPart(content: line, isMath: isMath && !trimmed.isEmpty)
         }
     }
 }
@@ -360,6 +353,8 @@ struct KaTeXView: UIViewRepresentable {
         webView.isOpaque = false
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
+
+        let safeLatex = latex.replacingOccurrences(of: "`", with: "\\`")
         
         let html = """
         <!DOCTYPE html>
@@ -369,22 +364,17 @@ struct KaTeXView: UIViewRepresentable {
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
             <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
             <style>
-                body { 
-                    margin: 0; 
-                    padding: 8px 0; 
-                    background: transparent; 
-                    color: white; 
-                }
+                body { margin: 0; padding: 8px 0; background: transparent; color: white; }
                 .katex { font-size: 1.05em; }
-                .katex-display { margin: 10px 0; }
             </style>
         </head>
         <body>
             <div id="math"></div>
             <script>
-                katex.render(`\(latex.replacingOccurrences(of: "`", with: "\\`"))`, 
-                            document.getElementById('math'), 
-                            { throwOnError: false, displayMode: true });
+                katex.render(`\(safeLatex)`, document.getElementById('math'), {
+                    throwOnError: false,
+                    displayMode: true
+                });
             </script>
         </body>
         </html>
@@ -397,7 +387,7 @@ struct KaTeXView: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 }
 
-// MARK: - WaveLoadingAnimation + AppImagePicker
+// MARK: - WaveLoadingAnimation
 struct WaveLoadingAnimation: View {
     let color: Color
     @State private var animating = false
@@ -421,6 +411,7 @@ struct WaveLoadingAnimation: View {
     }
 }
 
+// MARK: - AppImagePicker
 struct AppImagePicker: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
     @Environment(\.dismiss) var dismiss
