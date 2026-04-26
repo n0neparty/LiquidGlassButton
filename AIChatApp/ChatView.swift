@@ -279,7 +279,6 @@ struct ChatView: View {
 // MARK: - Wave Loading Animation
 struct WaveLoadingAnimation: View {
     let color: Color
-    @State private var animating = false
     private let barCount = 5
     private let barWidth: CGFloat = 4
     private let maxHeight: CGFloat = 22
@@ -288,20 +287,37 @@ struct WaveLoadingAnimation: View {
     var body: some View {
         HStack(spacing: 5) {
             ForEach(0..<barCount, id: \.self) { i in
-                RoundedRectangle(cornerRadius: barWidth / 2)
-                    .fill(color)
-                    .frame(width: barWidth, height: animating ? maxHeight : minHeight)
-                    .animation(
-                        .easeInOut(duration: 0.45)
-                        .repeatForever(autoreverses: true)
-                        .delay(Double(i) * 0.1),
-                        value: animating
-                    )
+                WaveBar(color: color, barWidth: barWidth, maxHeight: maxHeight, minHeight: minHeight, delay: Double(i) * 0.12)
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .background(.ultraThinMaterial, in: Capsule())
-        .onAppear { animating = true }
+    }
+}
+
+private struct WaveBar: View {
+    let color: Color
+    let barWidth: CGFloat
+    let maxHeight: CGFloat
+    let minHeight: CGFloat
+    let delay: Double
+    @State private var animating = false
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: barWidth / 2)
+            .fill(color)
+            .frame(width: barWidth, height: animating ? maxHeight : minHeight)
+            .animation(
+                .easeInOut(duration: 0.45)
+                .repeatForever(autoreverses: true)
+                .delay(delay),
+                value: animating
+            )
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    animating = true
+                }
+            }
     }
 }
 
