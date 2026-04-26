@@ -279,29 +279,83 @@ struct ChatView: View {
 // MARK: - Wave Loading Animation
 struct WaveLoadingAnimation: View {
     let color: Color
-    @State private var animating = false
+    @State private var animate1 = false
+    @State private var animate2 = false
+    @State private var animate3 = false
+    @State private var animate4 = false
+    @State private var animate5 = false
+    
     private let barCount = 5
     private let barWidth: CGFloat = 4
     private let maxHeight: CGFloat = 22
     private let minHeight: CGFloat = 5
+    private let animationDuration = 0.6
 
     var body: some View {
         HStack(spacing: 5) {
-            ForEach(0..<barCount, id: \.self) { i in
-                RoundedRectangle(cornerRadius: barWidth / 2)
-                    .fill(color)
-                    .frame(width: barWidth, height: animating ? maxHeight : minHeight)
-                    .animation(
-                        .easeInOut(duration: 0.45)
-                        .repeatForever(autoreverses: true)
-                        .delay(Double(i) * 0.1),
-                        value: animating
-                    )
-            }
+            // Bar 1
+            RoundedRectangle(cornerRadius: barWidth / 2)
+                .fill(color)
+                .frame(width: barWidth, height: animate1 ? maxHeight : minHeight)
+                .animation(
+                    .easeInOut(duration: animationDuration)
+                    .repeatForever(autoreverses: true),
+                    value: animate1
+                )
+            
+            // Bar 2
+            RoundedRectangle(cornerRadius: barWidth / 2)
+                .fill(color)
+                .frame(width: barWidth, height: animate2 ? maxHeight : minHeight)
+                .animation(
+                    .easeInOut(duration: animationDuration)
+                    .repeatForever(autoreverses: true)
+                    .delay(0.1),
+                    value: animate2
+                )
+            
+            // Bar 3
+            RoundedRectangle(cornerRadius: barWidth / 2)
+                .fill(color)
+                .frame(width: barWidth, height: animate3 ? maxHeight : minHeight)
+                .animation(
+                    .easeInOut(duration: animationDuration)
+                    .repeatForever(autoreverses: true)
+                    .delay(0.2),
+                    value: animate3
+                )
+            
+            // Bar 4
+            RoundedRectangle(cornerRadius: barWidth / 2)
+                .fill(color)
+                .frame(width: barWidth, height: animate4 ? maxHeight : minHeight)
+                .animation(
+                    .easeInOut(duration: animationDuration)
+                    .repeatForever(autoreverses: true)
+                    .delay(0.3),
+                    value: animate4
+                )
+            
+            // Bar 5
+            RoundedRectangle(cornerRadius: barWidth / 2)
+                .fill(color)
+                .frame(width: barWidth, height: animate5 ? maxHeight : minHeight)
+                .animation(
+                    .easeInOut(duration: animationDuration)
+                    .repeatForever(autoreverses: true)
+                    .delay(0.4),
+                    value: animate5
+                )
         }
         .padding(.horizontal, 16).padding(.vertical, 10)
         .background(.ultraThinMaterial, in: Capsule())
-        .onAppear { animating = true }
+        .onAppear {
+            animate1 = true
+            animate2 = true
+            animate3 = true
+            animate4 = true
+            animate5 = true
+        }
     }
 }
 
