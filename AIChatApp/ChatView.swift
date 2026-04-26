@@ -223,14 +223,7 @@ struct ChatView: View {
                                    userMsg.contains("°") || userMsg.contains("\\(")
 
                 let finalMessage = isMathRelated 
-                    ? """
-                    Всегда используй KaTeX синтаксис:
-                    - Inline формулы: \\( ... \\)
-                    - Блочные формулы: \\[ ... \\] или $$ ... $$
-                    Для углов: \\angle, для треугольника: \\triangle, градусы: ^\\circ
-                    
-                    Вопрос: \(userMsg)
-                    """
+                    ? "Используй KaTeX: inline \\( ... \\), блок \\[ ... \\] или $$. \\angle для углов, \\triangle для треугольника.\n\n\(userMsg)"
                     : userMsg
 
                 let response = try await APIService.shared.sendMessage(
@@ -260,10 +253,6 @@ struct ChatView: View {
         return result
             .replacingOccurrences(of: "1337", with: "")
             .replacingOccurrences(of: "-----", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .components(separatedBy: .newlines)
-            .drop(while: { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
-            .joined(separator: "\n")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
@@ -309,7 +298,7 @@ struct MessageBubble: View {
                                 .foregroundColor(.primary)
                                 .multilineTextAlignment(.trailing)
                         } else {
-                            KaTeXMarkdownText(text: message.text, fontSize: ds.messageTextSize)
+                            KaTeXMarkdownText(text: message.text)
                         }
                     }
                     .padding(.horizontal, 14)
@@ -325,20 +314,18 @@ struct MessageBubble: View {
     }
 }
 
-// MARK: - KaTeX WebView (лучший рендер математики)
+// MARK: - KaTeX Markdown Renderer
 struct KaTeXMarkdownText: View {
     let text: String
-    let fontSize: CGFloat
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForEach(splitIntoMathAndText(text), id: \.self) { part in
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(splitContent(text), id: \.self) { part in
                 if part.isMath {
-                    KaTeXView(latex: part.content, fontSize: fontSize + 2)
-                        .frame(minHeight: 40)
+                    KaTeXView(latex: part.content)
                 } else {
                     Text(part.content)
-                        .font(.system(size: fontSize))
+                        .font(.system(size: 17))
                         .foregroundColor(.white)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -346,38 +333,26 @@ struct KaTeXMarkdownText: View {
         }
     }
 
-    private func splitIntoMathAndText(_ input: String) -> [MathPart] {
-        var parts: [MathPart] = []
+    private func splitContent(_ input: String) -> [ContentPart] {
         let lines = input.components(separatedBy: .newlines)
-        
-        for line in lines {
+        return lines.map { line in
             let trimmed = line.trimmingCharacters(in: .whitespaces)
-            guard !trimmed.isEmpty else { continue }
-            
-            if isMathContent(trimmed) {
-                parts.append(MathPart(content: trimmed, isMath: true))
-            } else {
-                parts.append(MathPart(content: line, isMath: false))
-            }
+            let isMath = trimmed.contains("\\(") || trimmed.contains("\\[") || 
+                        trimmed.contains("$$") || trimmed.contains("\\angle") || 
+                        trimmed.contains("\\triangle") || trimmed.contains("^\\circ")
+            return ContentPart(content: line, isMath: isMath)
         }
-        return parts
-    }
-
-    private func isMathContent(_ text: String) -> Bool {
-        let indicators = ["\\(", "\\)", "\\[", "\\]", "$$", "\\angle", "\\triangle", "^\\circ", "\\frac", "\\sqrt", "°", "△", "∠", "="]
-        return indicators.contains { text.contains($0) }
     }
 }
 
-struct MathPart: Hashable {
+struct ContentPart: Hashable {
     let content: String
     let isMath: Bool
 }
 
-// MARK: - WKWebView с KaTeX
+// MARK: - KaTeX WebView
 struct KaTeXView: UIViewRepresentable {
     let latex: String
-    let fontSize: CGFloat
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView()
@@ -394,24 +369,22 @@ struct KaTeXView: UIViewRepresentable {
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
             <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
             <style>
-                body { margin: 0; padding: 8px 0; background: transparent; color: #ffffff; font-size: \(fontSize)px; }
-                .katex { font-size: 1.1em; }
-                .katex-display { margin: 12px 0; }
+                body { 
+                    margin: 0; 
+                    padding: 8px 0; 
+                    background: transparent; 
+                    color: white; 
+                }
+                .katex { font-size: 1.05em; }
+                .katex-display { margin: 10px 0; }
             </style>
         </head>
         <body>
             <div id="math"></div>
             <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    try {
-                        katex.render(`\(latex)`, document.getElementById('math'), {
-                            throwOnError: false,
-                            displayMode: true
-                        });
-                    } catch(e) {
-                        document.getElementById('math').innerHTML = '<span style="color: #ff6b6b;">' + e.message + '</span>';
-                    }
-                });
+                katex.render(`\(latex.replacingOccurrences(of: "`", with: "\\`"))`, 
+                            document.getElementById('math'), 
+                            { throwOnError: false, displayMode: true });
             </script>
         </body>
         </html>
@@ -424,7 +397,7 @@ struct KaTeXView: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 }
 
-// MARK: - Остальные компоненты
+// MARK: - WaveLoadingAnimation + AppImagePicker
 struct WaveLoadingAnimation: View {
     let color: Color
     @State private var animating = false
